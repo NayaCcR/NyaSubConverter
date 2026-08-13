@@ -40,6 +40,6 @@ export function PrivacyBadge({ level }: { level: "low" | "medium" | "high" }) {
 }
 
 export const inputClass = "focus-ring h-10 w-full rounded-md border border-input bg-background px-3 text-sm placeholder:text-muted-foreground/70";
-export const buttonPrimary = "focus-ring inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50";
-export const buttonSecondary = "focus-ring inline-flex h-10 items-center justify-center gap-2 rounded-md border border-border bg-background px-4 text-sm font-medium transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50";
-export const iconButton = "focus-ring grid h-9 w-9 shrink-0 place-items-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50";
+export const buttonPrimary = "button-glow-primary focus-ring inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-[background-color,box-shadow,transform] hover:-translate-y-px hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50";
+export const buttonSecondary = "button-glow-secondary focus-ring inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-border bg-background px-4 text-sm font-medium transition-[background-color,border-color,box-shadow,transform] hover:-translate-y-px hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50";
+export const iconButton = "control-glow focus-ring grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-border/80 bg-muted/45 text-muted-foreground shadow-sm transition-[background-color,border-color,box-shadow,transform,color] hover:-translate-y-px hover:bg-primary/10 hover:text-primary disabled:opacity-50";

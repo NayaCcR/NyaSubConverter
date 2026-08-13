@@ -1,5 +1,7 @@
 # 生产部署
 
+生产编译前需要修改默认 Provider、本机 SubConverter 地址或预置短链服务时，请先阅读[生产编译前配置](configuration.md)。
+
 ## 构建与运行
 
 在 `Front` 目录执行：

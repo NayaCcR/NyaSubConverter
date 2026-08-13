@@ -10,29 +10,36 @@ export function SidebarNavLink({
   icon: Icon,
   label,
   nested = false,
+  collapsed = false,
+  onClick,
 }: {
   href: string;
   active: boolean;
   icon: LucideIcon;
   label: string;
   nested?: boolean;
+  collapsed?: boolean;
+  onClick?: () => void;
 }) {
   return (
     <Link
       href={href}
+      title={label}
+      onClick={onClick}
       className={cn(
-        "flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+        "flex h-10 items-center gap-3 rounded-lg border-l-2 border-transparent px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground",
         nested && "h-9 text-xs",
-        active && "bg-primary/10 text-primary"
+        collapsed && "justify-center border-l-0 px-0",
+        active && "border-primary bg-primary/10 text-primary shadow-sm"
       )}
     >
-      <Icon className="h-4 w-4 shrink-0" />
-      <span className="truncate">{label}</span>
+      <Icon className={collapsed ? "h-5 w-5 shrink-0" : "h-4 w-4 shrink-0"} />
+      <span className={collapsed ? "sr-only" : "truncate"}>{label}</span>
     </Link>
   );
 }
 
-/** Horizontal pill used by the topbar layout and the mobile nav row. */
+/** Horizontal link used by the topbar layout. */
 export function InlineNavLink({
   href,
   active,

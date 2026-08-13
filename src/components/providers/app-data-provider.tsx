@@ -10,6 +10,7 @@ import {
   defaultProviders,
   defaultSettings,
   normalizeOptions,
+  normalizeSettings,
 } from "@/lib/app-data";
 
 type AppDataContextValue = {
@@ -44,7 +45,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
           setProfiles(data.profiles.map((profile: Profile) => ({ ...profile, ...normalizeOptions(profile) })));
         }
         if (Array.isArray(data.history)) setHistory(data.history);
-        if (data.settings) setSettings({ ...defaultSettings, ...data.settings });
+        if (data.settings) setSettings(normalizeSettings(data.settings));
       }
     } catch {
       localStorage.removeItem(STORAGE_KEY);

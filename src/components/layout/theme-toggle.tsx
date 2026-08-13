@@ -18,7 +18,7 @@ export function ThemeToggle() {
       aria-label={t(`theme.${theme === "system" ? "system" : theme}`)}
       title={t(`theme.${theme === "system" ? "system" : theme}`)}
       onClick={() => setTheme(ORDER[(ORDER.indexOf(theme) + 1) % ORDER.length])}
-      className="grid h-9 w-9 place-items-center rounded-md border border-border bg-muted/35 text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+      className="control-glow grid h-9 w-9 place-items-center rounded-lg border border-border/80 bg-muted/45 text-muted-foreground shadow-sm transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
     >
       <Icon className="h-4 w-4" />
     </button>

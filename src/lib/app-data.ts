@@ -64,11 +64,27 @@ export type HistoryItem = {
 export type AppSettings = {
   publicListUrl: string;
   shortUrlEndpoint: string;
+  shortUrlToken: string;
+  shortUrlServices: CustomShortUrlService[];
   configUploadEndpoint: string;
   scriptApiEndpoint: string;
   rememberSource: boolean;
   maskSource: boolean;
   checkBeforeConvert: boolean;
+};
+
+export type CustomShortUrlService = {
+  id: string;
+  name: string;
+  endpoint: string;
+  token: string;
+};
+
+export type ShortUrlServiceOption = {
+  id: string;
+  label: string;
+  endpoint: string;
+  token: string;
 };
 
 export const defaultOptions: ConvertOptions = {
@@ -161,6 +177,8 @@ export const defaultProfiles: Profile[] = [
 export const defaultSettings: AppSettings = {
   publicListUrl: "",
   shortUrlEndpoint: "",
+  shortUrlToken: "",
+  shortUrlServices: [],
   configUploadEndpoint: "",
   scriptApiEndpoint: "",
   rememberSource: true,
@@ -192,12 +210,66 @@ export const targets = [
 ];
 
 export const shortUrlServices = [
-  { label: "v1.mk", value: "https://v1.mk/short" },
-  { label: "d1.mk", value: "https://d1.mk/short" },
-  { label: "dlj.tf", value: "https://dlj.tf/short" },
-  { label: "suo.yt", value: "https://suo.yt/short" },
-  { label: "sub.cm", value: "https://sub.cm/short" },
-];
+  { id: "builtin-v1-mk", label: "v1.mk", endpoint: "https://v1.mk/short", token: "" },
+  { id: "builtin-d1-mk", label: "d1.mk", endpoint: "https://d1.mk/short", token: "" },
+  { id: "builtin-dlj-tf", label: "dlj.tf", endpoint: "https://dlj.tf/short", token: "" },
+  { id: "builtin-suo-yt", label: "suo.yt", endpoint: "https://suo.yt/short", token: "" },
+  { id: "builtin-sub-cm", label: "sub.cm", endpoint: "https://sub.cm/short", token: "" },
+] satisfies ShortUrlServiceOption[];
+
+export function normalizeSettings(value?: Partial<AppSettings> | null): AppSettings {
+  const merged = { ...defaultSettings, ...(value ?? {}) };
+  const rawServices = Array.isArray(value?.shortUrlServices) ? value.shortUrlServices : [];
+  const shortUrlServices = rawServices
+    .map((service, index) => {
+      const item = service as Partial<CustomShortUrlService>;
+      const endpoint = typeof item.endpoint === "string" ? item.endpoint.trim() : "";
+      return {
+        id: typeof item.id === "string" && item.id.trim() ? item.id : `short-service-${index + 1}`,
+        name: typeof item.name === "string" && item.name.trim() ? item.name.trim() : getShortUrlServiceName(endpoint),
+        endpoint,
+        token: typeof item.token === "string" ? item.token : "",
+      };
+    })
+    .filter((service) => service.endpoint);
+
+  return {
+    ...merged,
+    shortUrlEndpoint: typeof merged.shortUrlEndpoint === "string" ? merged.shortUrlEndpoint : "",
+    shortUrlToken: typeof merged.shortUrlToken === "string" ? merged.shortUrlToken : "",
+    shortUrlServices,
+  };
+}
+
+export function getShortUrlServiceName(endpoint: string) {
+  try {
+    return new URL(endpoint).host || endpoint;
+  } catch {
+    return endpoint || "短链服务";
+  }
+}
+
+export function getShortUrlServiceOptions(settings: AppSettings): ShortUrlServiceOption[] {
+  const configured: ShortUrlServiceOption[] = [];
+  if (settings.shortUrlEndpoint.trim()) {
+    configured.push({
+      id: "configured-default",
+      label: "默认短链 API",
+      endpoint: settings.shortUrlEndpoint.trim(),
+      token: settings.shortUrlToken,
+    });
+  }
+  settings.shortUrlServices.forEach((service) => {
+    if (!service.endpoint.trim()) return;
+    configured.push({
+      id: service.id,
+      label: service.name.trim() || getShortUrlServiceName(service.endpoint),
+      endpoint: service.endpoint.trim(),
+      token: service.token,
+    });
+  });
+  return [...configured, ...shortUrlServices];
+}
 
 export const remoteConfigGroups = [
   {

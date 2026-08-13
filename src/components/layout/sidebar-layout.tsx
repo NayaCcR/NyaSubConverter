@@ -1,46 +1,69 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import type { ReactNode } from "react";
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { BrandLogo } from "@/components/layout/brand-logo";
-import { InlineNavLink, SidebarNavLink, isActivePath } from "@/components/layout/nav-links";
+import { SidebarNavLink, isActivePath } from "@/components/layout/nav-links";
 import { SiteFooter } from "@/components/layout/site-footer";
-import { LanguageSelect } from "@/components/layout/language-select";
-import { ThemeToggle } from "@/components/layout/theme-toggle";
-import { UserMenu } from "@/components/layout/user-menu";
 import { useI18n } from "@/components/providers/locale-provider";
+import { cn } from "@/lib/utils";
 import type { Branding, NavGroup } from "@/lib/site-config";
 
-/** Fixed left rail on desktop, header + scrolling nav row on mobile. */
+/** Fixed left rail with a compact desktop tools row and no desktop top-shell. */
 export function SidebarLayout({
   branding,
   groups,
+  pathname,
+  pageLabel,
+  collapsed,
+  onCollapse,
+  desktopActions,
+  mobileActions,
+  mobileDrawer,
   children,
 }: {
   branding: Branding;
   groups: NavGroup[];
-  children: React.ReactNode;
+  pathname: string;
+  pageLabel: string;
+  collapsed: boolean;
+  onCollapse: (collapsed: boolean) => void;
+  desktopActions: ReactNode;
+  mobileActions: ReactNode;
+  mobileDrawer: ReactNode;
+  children: ReactNode;
 }) {
-  const pathname = usePathname();
   const { t } = useI18n();
-  const flatItems = groups.flatMap((group) => group.items);
+  const CollapseIcon = collapsed ? PanelLeftOpen : PanelLeftClose;
+  const collapseLabel = t(collapsed ? "layout.sidebar.expand" : "layout.sidebar.collapse");
 
   return (
-    <div className="min-h-screen bg-muted/25 text-foreground">
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 border-r border-border bg-background lg:flex lg:flex-col">
-        <div className="border-b border-border px-5 py-5">
-          <BrandLogo branding={branding} variant="sidebar" subtitle={t(branding.taglineKey)} />
-          <div className="mt-4 flex items-center justify-center gap-2 rounded-md border border-border bg-muted/35 p-2">
-            <LanguageSelect />
-            <UserMenu />
-          </div>
+    <div className="min-h-screen text-foreground">
+      <aside
+        aria-label={t("layout.header.workspace")}
+        className={cn(
+          "fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-border/80 bg-card/75 backdrop-blur-xl transition-[width] duration-200 lg:flex",
+          collapsed ? "w-20" : "w-64"
+        )}
+      >
+        <div className={cn("border-b border-border/80 px-4 py-5", collapsed && "flex justify-center px-2")}>
+          <BrandLogo
+            branding={branding}
+            variant="sidebar"
+            subtitle={t(branding.taglineKey)}
+            showWordmark={!collapsed}
+            className={collapsed ? "justify-center" : undefined}
+          />
         </div>
 
-        <nav className="flex-1 space-y-5 overflow-y-auto px-3 py-5">
+        <nav className={cn("flex-1 space-y-5 overflow-y-auto py-5", collapsed ? "px-2" : "px-3")}>
           {groups.map((group) => (
             <div key={group.id} className="space-y-1">
-              <div className="px-3 text-[11px] font-medium uppercase text-muted-foreground">
-                {t(group.labelKey)}
-              </div>
+              {!collapsed && (
+                <div className="px-3 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                  {t(group.labelKey)}
+                </div>
+              )}
               {group.items.map((item) => (
                 <SidebarNavLink
                   key={item.href}
@@ -48,66 +71,49 @@ export function SidebarLayout({
                   active={isActivePath(pathname, item.href)}
                   icon={item.icon}
                   label={t(item.labelKey)}
+                  collapsed={collapsed}
                 />
               ))}
             </div>
           ))}
         </nav>
+
+        <div className={cn("border-t border-border/80 p-3", collapsed && "px-2")}>
+          {!collapsed && <p className="mb-3 px-2 text-[11px] leading-5 text-muted-foreground">{t("layout.header.workspace")}</p>}
+          <button
+            type="button"
+            onClick={() => onCollapse(!collapsed)}
+            title={collapseLabel}
+            aria-label={collapseLabel}
+            aria-pressed={collapsed}
+            className={cn(
+              "control-glow flex h-10 w-full items-center gap-3 rounded-lg border border-border/80 bg-muted/35 px-3 text-sm font-medium text-muted-foreground shadow-sm transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary",
+              collapsed && "justify-center px-0"
+            )}
+          >
+            <CollapseIcon className={collapsed ? "h-5 w-5 shrink-0" : "h-4 w-4 shrink-0"} />
+            <span className={collapsed ? "sr-only" : undefined}>{collapseLabel}</span>
+          </button>
+        </div>
       </aside>
 
-      <div className="flex min-h-screen min-w-0 flex-col lg:pl-64">
-        <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur">
-          <div className="relative flex h-14 items-center gap-2 px-3 lg:justify-center lg:px-5">
-            <BrandLogo branding={branding} variant="topbar" className="lg:hidden" />
-            <div className="hidden min-w-0 items-center gap-3 text-center lg:flex">
-              <BrandLogo
-                branding={branding}
-                variant="topbar"
-                showWordmark={false}
-              />
-              <span>
-                <span className="block text-sm font-medium leading-5">
-                  {currentLabel(pathname, flatItems, t, branding.appName)}
-                </span>
-                <span className="block text-[11px] text-muted-foreground">{t("layout.header.workspace")}</span>
-              </span>
-            </div>
-            <div className="hidden lg:absolute lg:right-5 lg:flex lg:items-center">
-              <ThemeToggle />
-            </div>
-            <div className="ml-auto flex items-center gap-1 lg:absolute lg:right-5 lg:hidden">
-              <ThemeToggle />
-              <LanguageSelect />
-              <UserMenu />
-            </div>
-          </div>
-          <nav className="scrollbar-none flex gap-1 overflow-x-auto border-t border-border px-2 py-2 lg:hidden">
-            {flatItems.map((item) => (
-              <InlineNavLink
-                key={item.href}
-                href={item.href}
-                active={isActivePath(pathname, item.href)}
-                icon={item.icon}
-                label={t(item.labelKey)}
-                compact
-              />
-            ))}
-          </nav>
-        </header>
+      <header className="sticky top-0 z-30 flex min-h-16 items-center justify-between border-b border-border/80 bg-background/75 px-4 backdrop-blur-xl lg:hidden">
+        <BrandLogo branding={branding} variant="topbar" />
+        <div className="flex items-center">{mobileActions}</div>
+      </header>
+      {mobileDrawer}
 
-        <main className="min-w-0 flex-1 bg-background lg:rounded-l-xl lg:border-l lg:border-border">{children}</main>
+      <div className={cn("min-h-screen transition-[padding] duration-200", collapsed ? "lg:pl-20" : "lg:pl-64")}>
+        {/* Sidebar mode intentionally keeps only this compact action row on desktop. */}
+        <div className="desktop-page-tools hidden h-16 items-center justify-between border-b border-border/80 px-6 lg:flex">
+          <span className="text-xs text-muted-foreground">
+            {t("layout.header.workspace")} <span className="px-1 text-border">/</span> {pageLabel}
+          </span>
+          <div className="desktop-shell-actions flex items-center rounded-lg border border-border/80 bg-muted/45 p-1 shadow-sm">{desktopActions}</div>
+        </div>
+        <main key={pathname} className="min-h-[calc(100vh-4rem)] bg-transparent">{children}</main>
         <SiteFooter branding={branding} className="lg:border-l" />
       </div>
     </div>
   );
-}
-
-function currentLabel(
-  pathname: string | null,
-  items: { href: string; labelKey: string }[],
-  t: (key: string) => string,
-  fallback: string
-): string {
-  const item = items.find((nav) => isActivePath(pathname, nav.href));
-  return item ? t(item.labelKey) : fallback;
 }

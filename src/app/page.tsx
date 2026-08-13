@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
   ArrowRight,
@@ -25,18 +25,19 @@ import { PageHeader, PrivacyBadge, SectionTitle, buttonPrimary, buttonSecondary,
 import {
   buildConvertUrl,
   defaultOptions,
+  getShortUrlServiceOptions,
   normalizeOptions,
   parseConvertUrl,
-  shortUrlServices,
   targets,
   type ConvertOptions,
   type Provider,
+  type ShortUrlServiceOption,
   uid,
 } from "@/lib/app-data";
 import { cn } from "@/lib/utils";
 
 export default function HomePage() {
-  const { providers, profiles, settings, setHistory, setProviders } = useAppData();
+  const { ready, providers, profiles, settings, setHistory, setProviders } = useAppData();
   const enabledProviders = providers.filter((item) => item.enabled);
   const defaultProvider = enabledProviders.find((item) => item.isDefault) ?? enabledProviders[0];
   const [source, setSource] = useState("");
@@ -45,7 +46,9 @@ export default function HomePage() {
   const [advanced, setAdvanced] = useState(false);
   const [resultUrl, setResultUrl] = useState("");
   const [shortUrl, setShortUrl] = useState("");
-  const [shortEndpoint, setShortEndpoint] = useState(settings.shortUrlEndpoint);
+  const [shortServiceId, setShortServiceId] = useState("");
+  const [shortEndpoint, setShortEndpoint] = useState("");
+  const [shortToken, setShortToken] = useState("");
   const [shortSlug, setShortSlug] = useState("");
   const [shortening, setShortening] = useState(false);
   const [copied, setCopied] = useState<"long" | "short" | "">("");
@@ -53,12 +56,25 @@ export default function HomePage() {
   const [error, setError] = useState("");
   const [importOpen, setImportOpen] = useState(false);
   const [uploadOpen, setUploadOpen] = useState(false);
+  const shortServiceOptions = useMemo(() => getShortUrlServiceOptions(settings), [settings]);
+  const shortSelectionReady = useRef(false);
   const provider = enabledProviders.find((item) => item.id === providerId) ?? defaultProvider;
   const sources = splitSources(source);
   const canGenerate = Boolean(provider && sources.length);
   const popularTargets = targets.filter((item) => item.popular);
   const otherTargets = targets.filter((item) => !item.popular);
   const isOtherTarget = otherTargets.some((item) => item.value === options.target);
+
+  useEffect(() => {
+    if (!ready || shortSelectionReady.current) return;
+    const configured = shortServiceOptions.find((item) => item.id === "configured-default" || settings.shortUrlServices.some((service) => service.id === item.id));
+    if (configured) {
+      setShortServiceId(configured.id);
+      setShortEndpoint(configured.endpoint);
+      setShortToken(configured.token);
+    }
+    shortSelectionReady.current = true;
+  }, [ready, settings.shortUrlServices, shortServiceOptions]);
 
   async function generate() {
     if (!provider || !sources.length) return;
@@ -100,14 +116,36 @@ export default function HomePage() {
     setShortening(true);
     setError("");
     try {
-      const body = new FormData();
-      body.append("longUrl", btoa(resultUrl));
-      if (shortSlug.trim() && !shortSlug.includes("http")) body.append("shortKey", shortSlug.trim());
-      const response = await fetch(shortEndpoint.trim(), { method: "POST", body });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const data = await response.json();
-      const value = data.ShortUrl || data.shortUrl || data.url;
-      if ((data.Code !== undefined && data.Code !== 1) || !value) throw new Error(data.Message || "响应中没有短链接");
+      const endpoint = shortEndpoint.trim();
+      const token = shortToken.trim();
+      let response: Response;
+      if (token) {
+        const payload: { longUrl: string; customSlug?: string } = { longUrl: resultUrl };
+        if (shortSlug.trim() && !shortSlug.includes("http")) payload.customSlug = shortSlug.trim();
+        response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify(payload),
+        });
+      } else {
+        const body = new FormData();
+        body.append("longUrl", btoa(resultUrl));
+        if (shortSlug.trim() && !shortSlug.includes("http")) body.append("shortKey", shortSlug.trim());
+        response = await fetch(endpoint, { method: "POST", body });
+      }
+      const data = await response.json().catch(() => ({})) as {
+        Code?: number;
+        Message?: string;
+        shortUrl?: string;
+        ShortUrl?: string;
+        url?: string;
+        detail?: string;
+        message?: string;
+        error?: { message?: string };
+      };
+      const value = data.shortUrl || data.ShortUrl || data.url;
+      const errorMessage = data.error?.message || data.detail || data.message || data.Message;
+      if (!response.ok || (data.Code !== undefined && data.Code !== 1) || !value) throw new Error(errorMessage || `HTTP ${response.status}`);
       setShortUrl(String(value));
     } catch (cause) {
       setError(`短链接生成失败：${cause instanceof Error ? cause.message : "请检查 API 与跨域设置"}`);
@@ -137,7 +175,7 @@ export default function HomePage() {
     <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-7 sm:px-6 lg:py-9">
       <PageHeader
         title="订阅转换"
-        description="支持 SubConverter 完整参数、远程配置与多订阅合并。数据直接发送到所选后端，不经过 NyaSub 中转。"
+        description="支持 SubConverter 完整参数、远程配置与多订阅合并。数据直接发送到所选后端，不经过 NyaSubConverter 中转。"
         action={<button type="button" onClick={() => setImportOpen(true)} className={buttonSecondary}><FileInput className="h-4 w-4" />从 URL 解析</button>}
       />
 
@@ -188,7 +226,7 @@ export default function HomePage() {
               <div className="space-y-3 border-t border-emerald-500/20 pt-5">
                 <div><h3 className="text-sm font-semibold">生成短链接</h3><p className="mt-1 text-xs leading-5 text-muted-foreground">短链服务会收到包含订阅凭证的完整转换 URL，仅使用你信任的服务。</p></div>
                 <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_180px_auto]">
-                  <ShortEndpointField value={shortEndpoint} onChange={setShortEndpoint} />
+                  <ShortEndpointField value={shortEndpoint} serviceId={shortServiceId} services={shortServiceOptions} onChange={(selection) => { setShortServiceId(selection.serviceId); setShortEndpoint(selection.endpoint); setShortToken(selection.token); }} />
                   <input value={shortSlug} onChange={(event) => setShortSlug(event.target.value)} placeholder="自定义后缀（可选）" className={inputClass} />
                   <button type="button" onClick={createShortUrl} disabled={!shortEndpoint.trim() || shortening} className={buttonSecondary}>{shortening ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Link2 className="h-4 w-4" />}生成短链</button>
                 </div>
@@ -199,7 +237,7 @@ export default function HomePage() {
         </div>
 
         <aside className="space-y-4 xl:sticky xl:top-24">
-          <section className="rounded-lg border border-border bg-card p-5"><SectionTitle icon={ShieldCheck} title="数据路径" description="NyaSub 只在浏览器中组装请求" /><div className="mt-5 space-y-4 text-xs">{["订阅信息保留在当前浏览器", "直接请求所选 Provider", "短链与托管服务独立配置"].map((label, index) => <div key={label} className="flex gap-3"><span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-muted font-mono text-[10px] text-muted-foreground">{index + 1}</span><span className="leading-5 text-muted-foreground">{label}</span></div>)}</div></section>
+          <section className="rounded-lg border border-border bg-card p-5"><SectionTitle icon={ShieldCheck} title="数据路径" description="NyaSubConverter 只在浏览器中组装请求" /><div className="mt-5 space-y-4 text-xs">{["订阅信息保留在当前浏览器", "直接请求所选 Provider", "短链与托管服务独立配置"].map((label, index) => <div key={label} className="flex gap-3"><span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-muted font-mono text-[10px] text-muted-foreground">{index + 1}</span><span className="leading-5 text-muted-foreground">{label}</span></div>)}</div></section>
           <section className="rounded-lg border border-border bg-card p-5"><p className="text-xs font-medium text-muted-foreground">当前后端</p>{provider ? <div className="mt-3"><div className="flex items-center justify-between gap-3"><p className="truncate text-sm font-semibold">{provider.name}</p><span className={cn("h-2 w-2 rounded-full", provider.status === "online" ? "bg-emerald-500" : provider.status === "offline" ? "bg-destructive" : "bg-muted-foreground/40")} /></div><p className="mt-2 break-all font-mono text-[11px] leading-5 text-muted-foreground">{provider.endpoint}</p></div> : <p className="mt-3 text-sm text-muted-foreground">请先添加并启用转换后端</p>}</section>
         </aside>
       </div>
@@ -218,10 +256,12 @@ function ResultRow({ label, value, masked, copied, onCopy }: { label: string; va
   return <div className="space-y-2"><p className="text-xs font-medium text-muted-foreground">{label}</p><div className="flex items-stretch gap-2"><div title={value} className="min-w-0 flex-1 break-all rounded-md border border-border bg-background p-3 font-mono text-xs leading-5 text-muted-foreground">{masked}</div><button type="button" title="复制" onClick={onCopy} className={cn(iconButton, "h-auto")} >{copied ? <Check className="h-4 w-4 text-emerald-500" /> : <Clipboard className="h-4 w-4" />}</button></div></div>;
 }
 
-function ShortEndpointField({ value, onChange }: { value: string; onChange: (value: string) => void }) {
-  const known = shortUrlServices.some((item) => item.value === value);
-  const selection = !value ? "" : known ? value : "__custom__";
-  return <div className="grid gap-2"><select value={selection} onChange={(event) => onChange(event.target.value === "__custom__" ? "https://" : event.target.value)} className={inputClass}><option value="">选择短链 API</option>{shortUrlServices.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}<option value="__custom__">自定义 API</option></select>{selection === "__custom__" && <input value={value} onChange={(event) => onChange(event.target.value)} placeholder="https://example.com/short" className={inputClass} />}</div>;
+function ShortEndpointField({ value, serviceId, services, onChange }: { value: string; serviceId: string; services: ShortUrlServiceOption[]; onChange: (selection: { serviceId: string; endpoint: string; token: string }) => void }) {
+  const selected = services.find((item) => item.id === serviceId && item.endpoint === value);
+  const selection = selected ? selected.id : serviceId === "custom" || value ? "__custom__" : "";
+  const configured = services.filter((item) => !item.id.startsWith("builtin-"));
+  const builtins = services.filter((item) => item.id.startsWith("builtin-"));
+  return <div className="grid gap-2"><select value={selection} onChange={(event) => { if (event.target.value === "__custom__") { onChange({ serviceId: "custom", endpoint: "https://", token: "" }); return; } const service = services.find((item) => item.id === event.target.value); if (service) onChange({ serviceId: service.id, endpoint: service.endpoint, token: service.token }); }} className={inputClass}><option value="">选择短链 API</option>{configured.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}{builtins.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}<option value="__custom__">自定义 API</option></select>{selection === "__custom__" && <input value={value} onChange={(event) => onChange({ serviceId: "custom", endpoint: event.target.value, token: "" })} placeholder="https://example.com/short" className={inputClass} />}</div>;
 }
 
 function ImportUrlDialog({ onClose, onImport }: { onClose: () => void; onImport: (value: ReturnType<typeof parseConvertUrl>) => void }) {
@@ -240,7 +280,7 @@ function ImportUrlDialog({ onClose, onImport }: { onClose: () => void; onImport:
     } catch (cause) { setError(cause instanceof Error ? cause.message : "无法解析此 URL"); }
     finally { setLoading(false); }
   }
-  return <div className="fixed inset-0 z-50 grid place-items-center bg-black/45 p-4 backdrop-blur-sm" onMouseDown={(event) => event.target === event.currentTarget && onClose()}><form onSubmit={submit} className="w-full max-w-xl animate-scale-in rounded-lg border border-border bg-card p-5 shadow-2xl sm:p-6"><div className="flex items-start justify-between gap-4"><div><h2 className="font-semibold">从 URL 解析</h2><p className="mt-1 text-xs leading-5 text-muted-foreground">支持 NyaSub/SubConverter 长链接；短链接服务必须允许跨域并返回最终跳转地址。</p></div><button type="button" onClick={onClose} className={iconButton}><X className="h-4 w-4" /></button></div><textarea autoFocus value={value} onChange={(event) => setValue(event.target.value)} rows={6} placeholder="https://sub.example.com/sub?target=clash&url=..." className="focus-ring mt-5 w-full resize-y rounded-md border border-input bg-background p-3 font-mono text-xs leading-5" />{error && <p className="mt-3 text-sm text-destructive">{error}</p>}<div className="mt-5 flex justify-end gap-2"><button type="button" onClick={onClose} className={buttonSecondary}>取消</button><button type="submit" disabled={!value.trim() || loading} className={buttonPrimary}>{loading && <LoaderCircle className="h-4 w-4 animate-spin" />}解析并填入</button></div></form></div>;
+  return <div className="fixed inset-0 z-50 grid place-items-center bg-black/45 p-4 backdrop-blur-sm" onMouseDown={(event) => event.target === event.currentTarget && onClose()}><form onSubmit={submit} className="w-full max-w-xl animate-scale-in rounded-lg border border-border bg-card p-5 shadow-2xl sm:p-6"><div className="flex items-start justify-between gap-4"><div><h2 className="font-semibold">从 URL 解析</h2><p className="mt-1 text-xs leading-5 text-muted-foreground">支持 NyaSubConverter/SubConverter 长链接；短链接服务必须允许跨域并返回最终跳转地址。</p></div><button type="button" onClick={onClose} className={iconButton}><X className="h-4 w-4" /></button></div><textarea autoFocus value={value} onChange={(event) => setValue(event.target.value)} rows={6} placeholder="https://sub.example.com/sub?target=clash&url=..." className="focus-ring mt-5 w-full resize-y rounded-md border border-input bg-background p-3 font-mono text-xs leading-5" />{error && <p className="mt-3 text-sm text-destructive">{error}</p>}<div className="mt-5 flex justify-end gap-2"><button type="button" onClick={onClose} className={buttonSecondary}>取消</button><button type="submit" disabled={!value.trim() || loading} className={buttonPrimary}>{loading && <LoaderCircle className="h-4 w-4 animate-spin" />}解析并填入</button></div></form></div>;
 }
 
 function UploadConfigDialog({ endpoint, onClose, onUploaded }: { endpoint: string; onClose: () => void; onUploaded: (url: string) => void }) {

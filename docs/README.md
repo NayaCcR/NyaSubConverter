@@ -5,6 +5,7 @@ NyaSubConverter 是不绑定单一后端的订阅转换 Web Client。浏览器�
 - [快速开始](quick-start.md)：本地运行、基础转换和本地数据说明。
 - [Provider 接入](providers.md)：连接自建或第三方 SubConverter 服务。
 - [公共 Provider 列表](public-provider-list.md)：导出、发布和远程更新 Provider 清单。
+- [生产编译前配置](configuration.md)：修改默认转换后端、短链服务、本机地址和 Token 的注意事项。
 - [生产部署](deployment.md)：构建、反向代理和安全要求。
 
 ## 数据边界

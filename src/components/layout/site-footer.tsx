@@ -35,7 +35,7 @@ export function SiteFooter({
               target="_blank"
               rel="noreferrer"
               aria-label={t("layout.footer.repoLabel")}
-              className="grid h-7 w-7 place-items-center rounded-md border border-border bg-muted/35 text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+              className="control-glow grid h-7 w-7 place-items-center rounded-lg border border-border/80 bg-muted/35 text-muted-foreground shadow-sm transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
             >
               <Github className="h-4 w-4" />
             </a>
@@ -62,7 +62,7 @@ export function SiteFooter({
               href={credit.url}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-muted/30 px-2.5 transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+              className="control-glow inline-flex h-8 items-center gap-1.5 rounded-lg border border-border/80 bg-muted/30 px-2.5 transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
             >
               <span aria-hidden="true">{credit.prefix}</span>
               <span>{t(credit.noteKey)}</span>

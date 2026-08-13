@@ -39,10 +39,12 @@ export type Branding = {
 export type SiteConfig = {
   branding: Branding;
   /**
-   * Which shell to render. This is a build/deploy decision, not a viewer
-   * setting — there is deliberately no runtime toggle in the UI.
+   * Which shell to render by default. Viewers may switch it when
+   * `layoutSwitchable` is enabled.
    */
   layout: LayoutStyle;
+  /** Allow viewers to switch between the two template shell variants. */
+  layoutSwitchable: boolean;
   navGroups: NavGroup[];
   footer: {
     /** Rendered as `{app} by {author}` through the `layout.footer.credit` message. */
@@ -54,7 +56,7 @@ export type SiteConfig = {
 
 export const siteConfig: SiteConfig = {
   branding: {
-    appName: "NyaSub",
+    appName: "NyaSubConverter",
     taglineKey: "layout.header.console",
     logoUrl: "/logo.png",
     logoFallbackText: "N",
@@ -63,6 +65,7 @@ export const siteConfig: SiteConfig = {
   },
 
   layout: "sidebar",
+  layoutSwitchable: true,
 
   navGroups: [
     {
