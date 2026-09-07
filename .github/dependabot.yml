@@ -11,6 +11,10 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 3
+      exclude:
+        - "@nayaccr/*"
     registries:
       - nyastack
     allow:
