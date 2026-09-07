@@ -1,5 +1,26 @@
 # 生产编译前配置
 
+## NyaStack 共享依赖
+
+本产品从 GitHub Packages 消费 `@nayaccr/theme`、`@nayaccr/ui` 和 `@nayaccr/utils`。
+本地首次安装前运行以下命令，用户名填写小写 `nayaccr`，密码填写具有 `read:packages` 权限的 classic PAT（不是 GitHub 登录密码）：
+
+```powershell
+npm login --scope=@nayaccr --registry=https://npm.pkg.github.com --auth-type=legacy
+pnpm install --frozen-lockfile
+```
+
+Actions 和 Dependabot 是独立的 secret 存储；本仓库两处均需配置 `GH_PACKAGES_TOKEN`。
+只提交 scope registry 映射，不提交任何 token。Dependabot 每周生成共享依赖升级 PR，必须人工审查，不自动合并。
+
+主题 CSS 顺序：tokens → UI styles → globals → effects。保留产品字体、危险色与旧圆角别名；公共颜色、焦点和辉光由共享包维护。
+`src/components/ui` 保留 Button/Input 的尺寸适配和 Card/Dialog re-export，`src/lib/utils.ts` 保留 `cn` re-export。
+`FormDialog` 为四个产品编辑器提供可本地化关闭按钮、焦点锁定、焦点恢复、遮罩/Escape 关闭及小屏滚动。
+
+完成构建后执行 `pnpm exec playwright install chromium` 和 `pnpm test`，验证桌面/移动端的布局、语言、主题与弹窗。
+
+## 产品默认配置
+
 生产编译前如果需要更换默认转换后端、预置短链服务或调整品牌部署地址，可以直接修改源码中的默认数据。配置入口主要集中在：
 
 ```text
@@ -101,12 +122,14 @@ Token 会随前端 JavaScript 发送给浏览器，写入源码或 `defaultSetti
 修改完成后执行：
 
 ```powershell
-npm ci
-npm run typecheck
-npm run lint
-npm run build
-npm start
+pnpm install --frozen-lockfile
+pnpm typecheck
+pnpm lint
+pnpm build
+pnpm start
 ```
+
+使用 `.node-version` 指定的 Node.js 24，最低要求为 Node.js 22.13；pnpm 版本由 `package.json` 中的 `packageManager` 固定。CI 必须先安装 Node.js，再安装 pnpm。
 
 生产构建启动后，打开“转换后端”检查默认 Provider，再打开“订阅转换”检查短链 API 下拉框。
 

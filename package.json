@@ -4,7 +4,7 @@
   "private": true,
   "packageManager": "pnpm@11.13.1",
   "engines": {
-    "node": ">=20.9.0",
+    "node": ">=22.13.0",
     "pnpm": ">=11.0.0"
   },
   "scripts": {
@@ -12,17 +12,21 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "playwright test",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
-    "clsx": "^2.1.1",
+    "@nayaccr/theme": "^0.1.0",
+    "@nayaccr/ui": "^0.1.0",
+    "@nayaccr/utils": "^0.1.0",
     "lucide-react": "^0.460.0",
     "next": "14.2.15",
     "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "tailwind-merge": "^2.5.4"
+    "react-dom": "18.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "1.61.1",
     "@types/node": "20.14.0",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",

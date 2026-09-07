@@ -3,6 +3,9 @@ node_modules/
 out/
 *.log
 qa-*.png
+qa-*.json
+test-results/
+playwright-report/
 *.tsbuildinfo
 .env*.local
 .vscode/

@@ -1,5 +1,10 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { FormDialog } from "@/components/ui/form-dialog";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
@@ -17,7 +22,6 @@ import {
   ShieldCheck,
   Sparkles,
   UploadCloud,
-  X,
 } from "lucide-react";
 import { OptionFields } from "@/components/conversion/option-fields";
 import { useAppData } from "@/components/providers/app-data-provider";
@@ -176,12 +180,12 @@ export default function HomePage() {
       <PageHeader
         title="订阅转换"
         description="支持 SubConverter 完整参数、远程配置与多订阅合并。数据直接发送到所选后端，不经过 NyaSubConverter 中转。"
-        action={<button type="button" onClick={() => setImportOpen(true)} className={buttonSecondary}><FileInput className="h-4 w-4" />从 URL 解析</button>}
+        action={<Button variant="outline" type="button" onClick={() => setImportOpen(true)} className={buttonSecondary}><FileInput className="h-4 w-4" />从 URL 解析</Button>}
       />
 
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
         <div className="space-y-6">
-          <section className="space-y-5 rounded-lg border border-border bg-card p-5 shadow-sm sm:p-6">
+          <Card className="space-y-5 rounded-lg border border-border bg-card p-5 shadow-sm sm:p-6">
             <SectionTitle icon={Link2} title="订阅来源" description="支持订阅链接、单节点链接；每行一个或使用 | 分隔" action={<span className="text-xs text-muted-foreground">{sources.length} 个来源</span>} />
             <div className="relative">
               <textarea value={source} onChange={(event) => { setSource(event.target.value); setResultUrl(""); }} rows={5} spellCheck={false} placeholder={"https://example.com/subscribe?token=...\nvmess://..."} className="focus-ring w-full resize-y rounded-md border border-input bg-background px-3 py-3 font-mono text-sm leading-6 placeholder:font-sans placeholder:text-muted-foreground/55" />
@@ -210,12 +214,12 @@ export default function HomePage() {
 
             <div className="border-t border-border pt-4">
               <button type="button" onClick={() => setAdvanced((value) => !value)} className="flex w-full items-center justify-between text-sm font-medium"><span className="inline-flex items-center gap-2"><Settings2 className="h-4 w-4 text-muted-foreground" />高级转换选项</span><ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", advanced && "rotate-180")} /></button>
-              {advanced && <><OptionFields options={options} onChange={(value) => { setOptions(value); setResultUrl(""); }} /><div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-4"><p className="text-xs leading-5 text-muted-foreground">可将自定义 INI 配置托管后直接填入远程配置。</p><button type="button" onClick={() => setUploadOpen(true)} className={buttonSecondary}><UploadCloud className="h-4 w-4" />上传配置</button></div></>}
+              {advanced && <><OptionFields options={options} onChange={(value) => { setOptions(value); setResultUrl(""); }} /><div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-4"><p className="text-xs leading-5 text-muted-foreground">可将自定义 INI 配置托管后直接填入远程配置。</p><Button variant="outline" type="button" onClick={() => setUploadOpen(true)} className={buttonSecondary}><UploadCloud className="h-4 w-4" />上传配置</Button></div></>}
             </div>
 
             {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-            <button type="button" onClick={generate} disabled={!canGenerate || converting} className={cn(buttonPrimary, "w-full sm:h-11")}><Sparkles className={cn("h-4 w-4", converting && "animate-spin")} />{converting ? "正在检查后端" : "生成订阅链接"}<ArrowRight className="h-4 w-4" /></button>
-          </section>
+            <Button type="button" onClick={generate} disabled={!canGenerate || converting} className={cn(buttonPrimary, "w-full sm:h-11")}><Sparkles className={cn("h-4 w-4", converting && "animate-spin")} />{converting ? "正在检查后端" : "生成订阅链接"}<ArrowRight className="h-4 w-4" /></Button>
+          </Card>
 
           {resultUrl && (
             <section className="animate-fade-in space-y-5 rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-5 sm:p-6">
@@ -227,8 +231,8 @@ export default function HomePage() {
                 <div><h3 className="text-sm font-semibold">生成短链接</h3><p className="mt-1 text-xs leading-5 text-muted-foreground">短链服务会收到包含订阅凭证的完整转换 URL，仅使用你信任的服务。</p></div>
                 <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_180px_auto]">
                   <ShortEndpointField value={shortEndpoint} serviceId={shortServiceId} services={shortServiceOptions} onChange={(selection) => { setShortServiceId(selection.serviceId); setShortEndpoint(selection.endpoint); setShortToken(selection.token); }} />
-                  <input value={shortSlug} onChange={(event) => setShortSlug(event.target.value)} placeholder="自定义后缀（可选）" className={inputClass} />
-                  <button type="button" onClick={createShortUrl} disabled={!shortEndpoint.trim() || shortening} className={buttonSecondary}>{shortening ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Link2 className="h-4 w-4" />}生成短链</button>
+                  <Input value={shortSlug} onChange={(event) => setShortSlug(event.target.value)} placeholder="自定义后缀（可选）" className={inputClass} />
+                  <Button variant="outline" type="button" onClick={createShortUrl} disabled={!shortEndpoint.trim() || shortening} className={buttonSecondary}>{shortening ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Link2 className="h-4 w-4" />}生成短链</Button>
                 </div>
                 {shortUrl && <ResultRow label="订阅短链" value={shortUrl} masked={shortUrl} copied={copied === "short"} onCopy={() => copy(shortUrl, "short")} />}
               </div>
@@ -237,8 +241,8 @@ export default function HomePage() {
         </div>
 
         <aside className="space-y-4 xl:sticky xl:top-24">
-          <section className="rounded-lg border border-border bg-card p-5"><SectionTitle icon={ShieldCheck} title="数据路径" description="NyaSubConverter 只在浏览器中组装请求" /><div className="mt-5 space-y-4 text-xs">{["订阅信息保留在当前浏览器", "直接请求所选 Provider", "短链与托管服务独立配置"].map((label, index) => <div key={label} className="flex gap-3"><span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-muted font-mono text-[10px] text-muted-foreground">{index + 1}</span><span className="leading-5 text-muted-foreground">{label}</span></div>)}</div></section>
-          <section className="rounded-lg border border-border bg-card p-5"><p className="text-xs font-medium text-muted-foreground">当前后端</p>{provider ? <div className="mt-3"><div className="flex items-center justify-between gap-3"><p className="truncate text-sm font-semibold">{provider.name}</p><span className={cn("h-2 w-2 rounded-full", provider.status === "online" ? "bg-emerald-500" : provider.status === "offline" ? "bg-destructive" : "bg-muted-foreground/40")} /></div><p className="mt-2 break-all font-mono text-[11px] leading-5 text-muted-foreground">{provider.endpoint}</p></div> : <p className="mt-3 text-sm text-muted-foreground">请先添加并启用转换后端</p>}</section>
+          <Card className="shadow-none rounded-lg border border-border bg-card p-5"><SectionTitle icon={ShieldCheck} title="数据路径" description="NyaSubConverter 只在浏览器中组装请求" /><div className="mt-5 space-y-4 text-xs">{["订阅信息保留在当前浏览器", "直接请求所选 Provider", "短链与托管服务独立配置"].map((label, index) => <div key={label} className="flex gap-3"><span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-muted font-mono text-[10px] text-muted-foreground">{index + 1}</span><span className="leading-5 text-muted-foreground">{label}</span></div>)}</div></Card>
+          <Card className="shadow-none rounded-lg border border-border bg-card p-5"><p className="text-xs font-medium text-muted-foreground">当前后端</p>{provider ? <div className="mt-3"><div className="flex items-center justify-between gap-3"><p className="truncate text-sm font-semibold">{provider.name}</p><span className={cn("h-2 w-2 rounded-full", provider.status === "online" ? "bg-emerald-500" : provider.status === "offline" ? "bg-destructive" : "bg-muted-foreground/40")} /></div><p className="mt-2 break-all font-mono text-[11px] leading-5 text-muted-foreground">{provider.endpoint}</p></div> : <p className="mt-3 text-sm text-muted-foreground">请先添加并启用转换后端</p>}</Card>
         </aside>
       </div>
 
@@ -253,7 +257,7 @@ function PrivacyNotice({ provider }: { provider: Provider }) {
 }
 
 function ResultRow({ label, value, masked, copied, onCopy }: { label: string; value: string; masked: string; copied: boolean; onCopy: () => void }) {
-  return <div className="space-y-2"><p className="text-xs font-medium text-muted-foreground">{label}</p><div className="flex items-stretch gap-2"><div title={value} className="min-w-0 flex-1 break-all rounded-md border border-border bg-background p-3 font-mono text-xs leading-5 text-muted-foreground">{masked}</div><button type="button" title="复制" onClick={onCopy} className={cn(iconButton, "h-auto")} >{copied ? <Check className="h-4 w-4 text-emerald-500" /> : <Clipboard className="h-4 w-4" />}</button></div></div>;
+  return <div className="space-y-2"><p className="text-xs font-medium text-muted-foreground">{label}</p><div className="flex items-stretch gap-2"><div title={value} className="min-w-0 flex-1 break-all rounded-md border border-border bg-background p-3 font-mono text-xs leading-5 text-muted-foreground">{masked}</div><Button variant="ghost" size="icon" type="button" title="复制" onClick={onCopy} className={cn(iconButton, "h-auto")} >{copied ? <Check className="h-4 w-4 text-emerald-500" /> : <Clipboard className="h-4 w-4" />}</Button></div></div>;
 }
 
 function ShortEndpointField({ value, serviceId, services, onChange }: { value: string; serviceId: string; services: ShortUrlServiceOption[]; onChange: (selection: { serviceId: string; endpoint: string; token: string }) => void }) {
@@ -261,7 +265,7 @@ function ShortEndpointField({ value, serviceId, services, onChange }: { value: s
   const selection = selected ? selected.id : serviceId === "custom" || value ? "__custom__" : "";
   const configured = services.filter((item) => !item.id.startsWith("builtin-"));
   const builtins = services.filter((item) => item.id.startsWith("builtin-"));
-  return <div className="grid gap-2"><select value={selection} onChange={(event) => { if (event.target.value === "__custom__") { onChange({ serviceId: "custom", endpoint: "https://", token: "" }); return; } const service = services.find((item) => item.id === event.target.value); if (service) onChange({ serviceId: service.id, endpoint: service.endpoint, token: service.token }); }} className={inputClass}><option value="">选择短链 API</option>{configured.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}{builtins.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}<option value="__custom__">自定义 API</option></select>{selection === "__custom__" && <input value={value} onChange={(event) => onChange({ serviceId: "custom", endpoint: event.target.value, token: "" })} placeholder="https://example.com/short" className={inputClass} />}</div>;
+  return <div className="grid gap-2"><select value={selection} onChange={(event) => { if (event.target.value === "__custom__") { onChange({ serviceId: "custom", endpoint: "https://", token: "" }); return; } const service = services.find((item) => item.id === event.target.value); if (service) onChange({ serviceId: service.id, endpoint: service.endpoint, token: service.token }); }} className={inputClass}><option value="">选择短链 API</option>{configured.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}{builtins.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}<option value="__custom__">自定义 API</option></select>{selection === "__custom__" && <Input value={value} onChange={(event) => onChange({ serviceId: "custom", endpoint: event.target.value, token: "" })} placeholder="https://example.com/short" className={inputClass} />}</div>;
 }
 
 function ImportUrlDialog({ onClose, onImport }: { onClose: () => void; onImport: (value: ReturnType<typeof parseConvertUrl>) => void }) {
@@ -280,7 +284,7 @@ function ImportUrlDialog({ onClose, onImport }: { onClose: () => void; onImport:
     } catch (cause) { setError(cause instanceof Error ? cause.message : "无法解析此 URL"); }
     finally { setLoading(false); }
   }
-  return <div className="fixed inset-0 z-50 grid place-items-center bg-black/45 p-4 backdrop-blur-sm" onMouseDown={(event) => event.target === event.currentTarget && onClose()}><form onSubmit={submit} className="w-full max-w-xl animate-scale-in rounded-lg border border-border bg-card p-5 shadow-2xl sm:p-6"><div className="flex items-start justify-between gap-4"><div><h2 className="font-semibold">从 URL 解析</h2><p className="mt-1 text-xs leading-5 text-muted-foreground">支持 NyaSubConverter/SubConverter 长链接；短链接服务必须允许跨域并返回最终跳转地址。</p></div><button type="button" onClick={onClose} className={iconButton}><X className="h-4 w-4" /></button></div><textarea autoFocus value={value} onChange={(event) => setValue(event.target.value)} rows={6} placeholder="https://sub.example.com/sub?target=clash&url=..." className="focus-ring mt-5 w-full resize-y rounded-md border border-input bg-background p-3 font-mono text-xs leading-5" />{error && <p className="mt-3 text-sm text-destructive">{error}</p>}<div className="mt-5 flex justify-end gap-2"><button type="button" onClick={onClose} className={buttonSecondary}>取消</button><button type="submit" disabled={!value.trim() || loading} className={buttonPrimary}>{loading && <LoaderCircle className="h-4 w-4 animate-spin" />}解析并填入</button></div></form></div>;
+  return <FormDialog title="从 URL 解析" description="支持 NyaSubConverter/SubConverter 长链接；短链接服务必须允许跨域并返回最终跳转地址。" className="max-w-xl" onClose={onClose} onSubmit={submit}><textarea autoFocus value={value} onChange={(event) => setValue(event.target.value)} rows={6} placeholder="https://sub.example.com/sub?target=clash&url=..." className="focus-ring mt-5 w-full resize-y rounded-md border border-input bg-background p-3 font-mono text-xs leading-5" />{error && <p className="mt-3 text-sm text-destructive">{error}</p>}<div className="mt-5 flex justify-end gap-2"><Button variant="outline" type="button" onClick={onClose} className={buttonSecondary}>取消</Button><Button type="submit" disabled={!value.trim() || loading} className={buttonPrimary}>{loading && <LoaderCircle className="h-4 w-4 animate-spin" />}解析并填入</Button></div></FormDialog>;
 }
 
 function UploadConfigDialog({ endpoint, onClose, onUploaded }: { endpoint: string; onClose: () => void; onUploaded: (url: string) => void }) {
@@ -300,7 +304,7 @@ function UploadConfigDialog({ endpoint, onClose, onUploaded }: { endpoint: strin
     } catch (cause) { setError(`上传失败：${cause instanceof Error ? cause.message : "请检查 API 与跨域设置"}`); }
     finally { setLoading(false); }
   }
-  return <div className="fixed inset-0 z-50 grid place-items-center bg-black/45 p-4 backdrop-blur-sm"><form onSubmit={submit} className="w-full max-w-2xl animate-scale-in rounded-lg border border-border bg-card p-5 shadow-2xl sm:p-6"><div className="flex items-start justify-between gap-4"><div><h2 className="font-semibold">上传远程配置</h2><p className="mt-1 text-xs leading-5 text-muted-foreground">配置内容会发送到设置中指定的托管 API。请勿上传包含私密凭证的内容。</p></div><button type="button" onClick={onClose} className={iconButton}><X className="h-4 w-4" /></button></div><textarea autoFocus value={content} onChange={(event) => setContent(event.target.value)} rows={14} maxLength={50000} placeholder="粘贴 SubConverter INI 配置内容" className="focus-ring mt-5 w-full resize-y rounded-md border border-input bg-background p-3 font-mono text-xs leading-5" /><div className="mt-2 text-right text-[11px] text-muted-foreground">{content.length} / 50000</div>{!endpoint && <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">尚未配置托管 API，保存地址后才能上传。</p>}{error && <p className="mt-3 text-sm text-destructive">{error}</p>}<div className="mt-5 flex justify-end gap-2"><button type="button" onClick={onClose} className={buttonSecondary}>取消</button><button type="submit" disabled={!content.trim() || loading} className={buttonPrimary}>{loading && <LoaderCircle className="h-4 w-4 animate-spin" />}上传并应用</button></div></form></div>;
+  return <FormDialog title="上传远程配置" description="配置内容会发送到设置中指定的托管 API。请勿上传包含私密凭证的内容。" className="max-w-2xl" onClose={onClose} onSubmit={submit}><textarea autoFocus value={content} onChange={(event) => setContent(event.target.value)} rows={14} maxLength={50000} placeholder="粘贴 SubConverter INI 配置内容" className="focus-ring mt-5 w-full resize-y rounded-md border border-input bg-background p-3 font-mono text-xs leading-5" /><div className="mt-2 text-right text-[11px] text-muted-foreground">{content.length} / 50000</div>{!endpoint && <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">尚未配置托管 API，保存地址后才能上传。</p>}{error && <p className="mt-3 text-sm text-destructive">{error}</p>}<div className="mt-5 flex justify-end gap-2"><Button variant="outline" type="button" onClick={onClose} className={buttonSecondary}>取消</Button><Button type="submit" disabled={!content.trim() || loading} className={buttonPrimary}>{loading && <LoaderCircle className="h-4 w-4 animate-spin" />}上传并应用</Button></div></FormDialog>;
 }
 
 function splitSources(value: string) { return value.split(/\r?\n|\|/).map((item) => item.trim()).filter(Boolean); }

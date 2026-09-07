@@ -1,5 +1,7 @@
 "use client";
 
+import { Input } from "@/components/ui/input";
+
 import { remoteConfigGroups, type ConvertOptions } from "@/lib/app-data";
 import { inputClass } from "@/components/ui/app-ui";
 import { cn } from "@/lib/utils";
@@ -50,7 +52,7 @@ export function OptionFields({ options, onChange }: { options: ConvertOptions; o
           <option value="__custom__">自定义 URL</option>
         </select>
         {configSelection === "__custom__" && (
-          <input value={options.config} onChange={(event) => set("config", event.target.value)} placeholder="https://example.com/config.ini" className={inputClass} />
+          <Input value={options.config} onChange={(event) => set("config", event.target.value)} placeholder="https://example.com/config.ini" className={inputClass} />
         )}
       </div>
 
@@ -89,5 +91,5 @@ export function OptionFields({ options, onChange }: { options: ConvertOptions; o
 }
 
 function TextField({ label, value, placeholder, inputMode, onChange }: { label: string; value: string; placeholder: string; inputMode?: "decimal"; onChange: (value: string) => void }) {
-  return <label className="space-y-1.5 text-xs font-medium"><span>{label}</span><input value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} inputMode={inputMode} className={cn(inputClass, "font-normal")} /></label>;
+  return <label className="space-y-1.5 text-xs font-medium"><span>{label}</span><Input value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} inputMode={inputMode} className={cn(inputClass, "font-normal")} /></label>;
 }

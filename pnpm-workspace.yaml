@@ -3,3 +3,8 @@ packages:
 
 allowBuilds:
   unrs-resolver: true
+
+minimumReleaseAgeExclude:
+  - '@nayaccr/theme@0.1.0'
+  - '@nayaccr/ui@0.1.0'
+  - '@nayaccr/utils@0.1.0'

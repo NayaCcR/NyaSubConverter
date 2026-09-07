@@ -1,5 +1,9 @@
 import type { Metadata, Viewport } from "next";
+import "@nayaccr/theme/tokens.css";
+import "@nayaccr/ui/styles.css";
 import "./globals.css";
+// Effects follow Tailwind utilities so reduced-motion and focus win the cascade.
+import "@nayaccr/theme/effects.css";
 import { AppShell } from "@/components/layout/app-shell";
 import { LocaleProvider } from "@/components/providers/locale-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";

@@ -35,7 +35,7 @@ export function TopbarLayout({
   return (
     <div className="flex min-h-screen flex-col text-foreground">
       <header className="sticky top-0 z-40 border-b border-border/80 bg-background/70 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
-        <div className={cn(CONTAINER, "flex min-h-16 items-center gap-3 py-2")}>
+        <div className={cn(CONTAINER, "flex min-h-16 items-center gap-3 py-2 lg:min-h-[63px]")}>
           <BrandLogo branding={branding} variant="topbar" className="shrink-0" />
           <span aria-hidden="true" className="hidden h-6 w-px shrink-0 bg-border md:block" />
 
