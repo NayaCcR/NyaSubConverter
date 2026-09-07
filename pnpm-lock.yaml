@@ -12,8 +12,8 @@ importers:
         specifier: ^0.1.0
         version: 0.1.0
       '@nayaccr/ui':
-        specifier: ^0.1.0
-        version: 0.1.0(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.1.1
+        version: 0.1.1(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@nayaccr/utils':
         specifier: ^0.1.0
         version: 0.1.0
@@ -133,8 +133,8 @@ packages:
   '@nayaccr/theme@0.1.0':
     resolution: {integrity: sha512-18pEvcgBxZI2zxcMbdUpDdkPHUD2z8LvUXjc6TZWw6YLehX0LkCg42p8qv90RczL35xYVkFf6H8J1IvmsoBb+A==, tarball: https://npm.pkg.github.com/download/@nayaccr/theme/0.1.0/fe4f060be22892b3681b7715ead7c9311f7104be}
 
-  '@nayaccr/ui@0.1.0':
-    resolution: {integrity: sha512-DpaCvNu13Gmcqbh2KMcFIn1r6s/LAZdoRVU2dpQuWdSLd8RMtRDhq0j3TngUnIo4FSyb5zQGv6FVPWccGEGc5Q==, tarball: https://npm.pkg.github.com/download/@nayaccr/ui/0.1.0/0045b081054063890985c059420b55ddf85ba9e6}
+  '@nayaccr/ui@0.1.1':
+    resolution: {integrity: sha512-qFO6PnKpJpG3OaafiNWWSKcQDc0YzCNnhH4ntKbxyh8DPGYAlJgK25w5i2CHN/I22W4N80XxAFaIoExmTsqbMA==, tarball: https://npm.pkg.github.com/download/@nayaccr/ui/0.1.1/ba285628e70373f5f7d9f267d27757c1101e8d67}
     peerDependencies:
       react: '>=18 <20'
       react-dom: '>=18 <20'
@@ -1163,6 +1163,7 @@ packages:
   glob@10.3.10:
     resolution: {integrity: sha512-fa46+tv1Ak0UPK1TOy/pZrIybNNt4HCv7SDzwyfiOZkvZLEbjsZkJBPtDHVshZjbecAoAGSC20MjLDG/qr679g==}
     engines: {node: '>=16 || 14 >=14.17'}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   glob@7.2.0:
@@ -1494,6 +1495,7 @@ packages:
   next@14.2.15:
     resolution: {integrity: sha512-h9ctmOokpoDphRvMGnwOJAedT6zKhwqyZML9mDtspgf4Rh3Pn7UTYKqePNoDvhsWBAO5GoPNYshnAUGIazVGmw==}
     engines: {node: '>=18.17.0'}
+    deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/security-update-2025-12-11 for more details.
     hasBin: true
     peerDependencies:
       '@opentelemetry/api': ^1.1.0
@@ -2170,7 +2172,7 @@ snapshots:
 
   '@nayaccr/theme@0.1.0': {}
 
-  '@nayaccr/ui@0.1.0(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@nayaccr/ui@0.1.1(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@nayaccr/theme': 0.1.0
       '@nayaccr/utils': 0.1.0
