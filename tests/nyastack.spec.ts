@@ -67,7 +67,10 @@ for (const entry of [
     await expect(dialog).toHaveCount(0);
     await expect(trigger).toBeFocused();
     await trigger.click();
-    await page.mouse.click(3, 3);
+    await expect(dialog).toBeVisible();
+    // Locator clicks wait for the newly mounted overlay to be actionable.
+    // Raw mouse coordinates can race the dialog's portal/effect setup.
+    await page.locator('div[data-state="open"].fixed.inset-0').click({ position: { x: 3, y: 3 } });
     await expect(dialog).toHaveCount(0);
     await expect(trigger).toBeFocused();
     await trigger.click();
