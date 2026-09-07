@@ -4,6 +4,7 @@ registries:
   nyastack:
     type: npm-registry
     url: https://npm.pkg.github.com
+    scope: "@nayaccr"
     token: ${{ secrets.GH_PACKAGES_TOKEN }}
 
 updates:

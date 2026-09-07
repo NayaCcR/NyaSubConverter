@@ -14,3 +14,4 @@
 - Actions 和 Dependabot 分别配置 `GH_PACKAGES_TOKEN`（classic PAT，read:packages）。不能将 token 提交到仓库、写进前端环境变量或日志。
 - Dependabot 每周为 `@nayaccr/*` 创建分组 PR；需要检查变更和 CI，不自动合并。
 - 经用户授权，仅自有 `@nayaccr/*` 包豁免 Dependabot 冷却期；其他包保留 3 天冷却。此例外不代表自动合并，也不允许关闭全局供应链保护。
+- Dependabot 的私有 registry 必须声明 `scope: "@nayaccr"`，避免自动生成的配置将公共 npm 包也路由到 GitHub Packages；本地 `.npmrc` 默认源保持 npmjs，仅 `@nayaccr` 使用私有源。
