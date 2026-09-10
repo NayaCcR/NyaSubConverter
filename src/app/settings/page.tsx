@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
 import { Check, Database, Download, Eye, EyeOff, ExternalLink, KeyRound, Link2, Plus, RotateCcw, Settings, Shield, Trash2, Upload, X } from "lucide-react";
 import { useAppData } from "@/components/providers/app-data-provider";
+import Link from "next/link";
+import { catalogUrl } from "@/lib/rule-catalog";
 import { PageHeader, SectionTitle, buttonSecondary, iconButton, inputClass } from "@/components/ui/app-ui";
 import {
   defaultProfiles,
@@ -105,6 +107,8 @@ export default function SettingsPage() {
         </label>
       </Card>
 
+      <RuleCatalogSettings value={settings.ruleCatalogUrl} onSave={(value) => change("ruleCatalogUrl", value)} />
+
       <Card className="shadow-none space-y-5 rounded-lg border border-border bg-card p-5 sm:p-6">
         <SectionTitle icon={Link2} title="扩展服务" description="短链和配置托管不是 SubConverter 标准接口，按需接入你信任的服务" />
 
@@ -186,6 +190,32 @@ export default function SettingsPage() {
         <a href="https://github.com/tindy2013/subconverter" target="_blank" rel="noreferrer" className={buttonSecondary}><ExternalLink className="h-4 w-4" />SubConverter 项目</a>
       </section>
     </div>
+  );
+}
+
+function RuleCatalogSettings({ value, onSave }: { value: string; onSave: (url: string) => void }) {
+  const [draft, setDraft] = useState(value);
+  const [error, setError] = useState("");
+  useEffect(() => setDraft(value), [value]);
+  function save(event: React.FormEvent) {
+    event.preventDefault();
+    try {
+      const trimmed = draft.trim() || defaultSettings.ruleCatalogUrl;
+      const resolved = catalogUrl(trimmed, window.location.href);
+      onSave(trimmed === defaultSettings.ruleCatalogUrl ? trimmed : resolved);
+      setError("");
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "规则目录地址无效"); }
+  }
+  return (
+    <Card id="rule-catalog" className="shadow-none space-y-5 rounded-lg border border-border bg-card p-5 sm:p-6">
+      <SectionTitle icon={Download} title="在线规则目录" description="使用内置规则库，或填写 NyaSub 公开部署的目录地址。保存后自动拉取，更新失败时继续保留缓存。" />
+      <form onSubmit={save} className="space-y-3">
+        <label className="block space-y-2 text-sm font-medium"><span>规则目录 URL</span><Input value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="https://nyasub.example.com/rules/catalog.json" className={inputClass} /></label>
+        {error && <p role="alert" className="text-xs text-destructive">{error}</p>}
+        <div className="flex flex-wrap gap-2"><Button type="submit" variant="outline" className={buttonSecondary}>保存规则目录</Button><Button type="button" variant="outline" onClick={() => { setDraft(defaultSettings.ruleCatalogUrl); onSave(defaultSettings.ruleCatalogUrl); setError(""); }} className={buttonSecondary}>恢复内置目录</Button><Link href="/rules" className={buttonSecondary}>浏览规则库</Link></div>
+      </form>
+      <p className="text-[11px] leading-5 text-muted-foreground">默认 /rules/catalog.json 随源码部署。跨站点目录需允许 CORS；配置文件由转换后端拉取，请使用后端能够访问的域名。只支持 HTTP(S) 公共目录，不发送浏览器凭证。</p>
+    </Card>
   );
 }
 

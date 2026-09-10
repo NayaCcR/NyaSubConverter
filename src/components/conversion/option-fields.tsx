@@ -1,6 +1,9 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
+import { useRuleCatalog } from "@/components/providers/rule-catalog-provider";
+import { isLocalRuleUrl } from "@/lib/rule-catalog";
 
 import { remoteConfigGroups, type ConvertOptions } from "@/lib/app-data";
 import { inputClass } from "@/components/ui/app-ui";
@@ -30,20 +33,25 @@ const toggles: { key: BooleanOptionKey; label: string; hint: string }[] = [
 ];
 
 export function OptionFields({ options, onChange }: { options: ConvertOptions; onChange: (options: ConvertOptions) => void }) {
-  const knownConfig = remoteConfigGroups.flatMap((group) => group.options).some((item) => item.value === options.config);
+  const { snapshot, loading, error, fromCache } = useRuleCatalog();
+  const templates = snapshot?.catalog.templates ?? [];
+  const selectedTemplate = templates.find((item) => item.config_url === options.config);
+  const knownConfig = Boolean(selectedTemplate) || remoteConfigGroups.flatMap((group) => group.options).some((item) => item.value === options.config);
   const configSelection = !options.config ? "" : knownConfig ? options.config : "__custom__";
   const set = <K extends keyof ConvertOptions>(key: K, value: ConvertOptions[K]) => onChange({ ...options, [key]: value });
 
   return (
     <div className="mt-4 space-y-5 border-t border-border pt-5">
       <div className="space-y-3">
-        <h3 className="text-xs font-semibold text-muted-foreground">远程配置</h3>
+        <div className="flex items-center justify-between gap-3"><h3 className="text-xs font-semibold text-muted-foreground">远程配置</h3><Link href="/rules" className="text-xs text-primary hover:underline">浏览规则库</Link></div>
         <select
+          aria-label="远程规则配置"
           value={configSelection}
           onChange={(event) => set("config", event.target.value === "__custom__" ? "https://" : event.target.value)}
           className={inputClass}
         >
           <option value="">不使用远程配置</option>
+          {templates.length > 0 && <optgroup label="在线规则库">{templates.map((item) => <option key={item.id} value={item.config_url}>{item.name}</option>)}</optgroup>}
           {remoteConfigGroups.map((group) => (
             <optgroup key={group.label} label={group.label}>
               {group.options.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
@@ -54,6 +62,9 @@ export function OptionFields({ options, onChange }: { options: ConvertOptions; o
         {configSelection === "__custom__" && (
           <Input value={options.config} onChange={(event) => set("config", event.target.value)} placeholder="https://example.com/config.ini" className={inputClass} />
         )}
+        {selectedTemplate && <p className="text-xs leading-5 text-muted-foreground">{selectedTemplate.description}{selectedTemplate.warnings?.map((warning, index) => <span key={index} className="mt-1 block">{warning}</span>)}</p>}
+        {(loading || error || fromCache) && <p className="text-[11px] leading-5 text-muted-foreground">{loading ? "规则库更新中…" : error ? `规则库更新失败${snapshot ? "，继续使用缓存" : "，可在规则库页面重试"}。` : "使用已缓存的规则目录。"}</p>}
+        {options.config && <p className="text-[11px] leading-5 text-muted-foreground">规则由转换后端在线读取。{isLocalRuleUrl(options.config) ? "当前规则地址是本机地址；使用远程后端时，请在设置中改用已公开部署的规则目录。" : "请确保所选后端能够访问此配置地址。"}</p>}
       </div>
 
       <div className="space-y-3">

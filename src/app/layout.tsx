@@ -8,6 +8,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { LocaleProvider } from "@/components/providers/locale-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { AppDataProvider } from "@/components/providers/app-data-provider";
+import { RuleCatalogProvider } from "@/components/providers/rule-catalog-provider";
 import { siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
@@ -45,7 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <LocaleProvider>
             <AppDataProvider>
-              <AppShell>{children}</AppShell>
+              <RuleCatalogProvider><AppShell>{children}</AppShell></RuleCatalogProvider>
             </AppDataProvider>
           </LocaleProvider>
         </ThemeProvider>

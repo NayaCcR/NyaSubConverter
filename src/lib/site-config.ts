@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { History, House, ServerCog, Settings, SlidersHorizontal } from "lucide-react";
+import { History, House, Library, ServerCog, Settings, SlidersHorizontal } from "lucide-react";
 
 /**
  * The one file to edit when reusing this template.
@@ -75,6 +75,7 @@ export const siteConfig: SiteConfig = {
         { href: "/", labelKey: "nav.home", icon: House },
         { href: "/providers", labelKey: "nav.providers", icon: ServerCog },
         { href: "/profiles", labelKey: "nav.profiles", icon: SlidersHorizontal },
+        { href: "/rules", labelKey: "nav.rules", icon: Library },
       ],
     },
     {

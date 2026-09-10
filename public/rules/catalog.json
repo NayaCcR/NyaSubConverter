@@ -1,0 +1,183 @@
+{
+  "version": 1,
+  "updated_at": "2026-09-11T00:00:00Z",
+  "templates": [
+    {
+      "id": "airport-default",
+      "name": "机场分流 · 默认",
+      "description": "从当前已导入的机场配置提取，保留 9,816 条规则和 11 个策略组；节点候选改为全部节点或地区选择。",
+      "warnings": [
+        "机场原始规则未标明公开许可证；保留用户提供的规则快照与分组，不包含节点地址、密码、订阅链接或客户端设置。",
+        "地区候选按节点名称识别；地区无匹配节点时保留原静态候选，不会扩大到全部节点。",
+        "INI 面向 Clash / Mihomo 目标；其他目标可能不支持全部规则。转换后请核对所用核心的规则与协议兼容性。"
+      ],
+      "source": {
+        "name": "用户提供的机场规则快照",
+        "url": "https://github.com/nayaccr/nyasub/tree/main/rule-templates",
+        "retrieved_at": "2026-09-11",
+        "license": "未声明（用户提供）"
+      },
+      "config_url": "configs/airport-default.ini",
+      "payload_url": "payloads/airport-default.json",
+      "rule_count": 9816,
+      "group_count": 11
+    },
+    {
+      "id": "applications-snapshot",
+      "name": "应用精细分流 · 公开规则快照",
+      "description": "采用 blackmatrix7 的 9 类公开规则，共 1533 条应用规则；AI、Telegram、YouTube、Netflix、Steam、GitHub 分组，Steam 国内下载优先直连。",
+      "warnings": [
+        "6 条 IP-ASN 规则未纳入：当前转换器暂不支持，原文与排除记录已保留；此模板不是上游规则的无损完整导入。",
+        "这是随版本附带的静态快照，不会自动追更；上游文件所标更新时间为 2024–2025 年。",
+        "地区候选按节点名称识别；对应地区没有节点时该地区组为 REJECT，请先检查节点池再选择地区组。",
+        "INI 面向 Clash / Mihomo 目标；其他目标可能不支持全部规则。转换后请核对所用核心的规则与协议兼容性。",
+        "INI 的纯动态测速组额外保留 REJECT，避免没有匹配节点时 SubConverter 默认退回 DIRECT；JSON 在无节点时由 NyaSub 加入 REJECT。"
+      ],
+      "source": {
+        "name": "blackmatrix7/ios_rule_script",
+        "url": "https://github.com/blackmatrix7/ios_rule_script/tree/4112f8e7b3a9f23c9ccf381beaa5931a36df3781/rule/Clash",
+        "revision": "4112f8e7b3a9f23c9ccf381beaa5931a36df3781",
+        "retrieved_at": "2026-09-10T20:54:43.030Z",
+        "license": "GPL-2.0"
+      },
+      "config_url": "configs/applications-snapshot.ini",
+      "payload_url": "payloads/applications-snapshot.json",
+      "rule_count": 1547,
+      "group_count": 14
+    },
+    {
+      "id": "balanced-starter",
+      "name": "均衡日用 · 内置起始模板",
+      "description": "保留常见国内域名直连、自动测速和手动选节点，其他连接按国内 IP 与最终策略分流，适合自己逐步补规则。",
+      "warnings": [
+        "这是少量基础规则组成的起始模板，不包含完整应用库或广告拦截列表。",
+        "INI 面向 Clash / Mihomo 目标；其他目标可能不支持全部规则。转换后请核对所用核心的规则与协议兼容性。",
+        "INI 的纯动态测速组额外保留 REJECT，避免没有匹配节点时 SubConverter 默认退回 DIRECT；JSON 在无节点时由 NyaSub 加入 REJECT。"
+      ],
+      "source": {
+        "name": "NyaSub",
+        "url": "https://github.com/nayaccr/nyasub/tree/main/rule-templates",
+        "license": "GPL-3.0"
+      },
+      "config_url": "configs/balanced-starter.ini",
+      "payload_url": "payloads/balanced-starter.json",
+      "rule_count": 23,
+      "group_count": 4
+    },
+    {
+      "id": "minimal-starter",
+      "name": "极简分流 · 内置起始模板",
+      "description": "局域网与国内 IP 直连，其他连接走节点选择；只有一个策略组，方便从空白开始编辑。",
+      "source": {
+        "name": "NyaSub",
+        "url": "https://github.com/nayaccr/nyasub/tree/main/rule-templates",
+        "license": "GPL-3.0"
+      },
+      "config_url": "configs/minimal-starter.ini",
+      "payload_url": "payloads/minimal-starter.json",
+      "warnings": [
+        "INI 面向 Clash / Mihomo 目标；其他目标可能不支持全部规则。转换后请核对所用核心的规则与协议兼容性。"
+      ],
+      "rule_count": 14,
+      "group_count": 1
+    },
+    {
+      "id": "dustinwin-full",
+      "name": "DustinWin · 全分组 + 广告拦截",
+      "description": "包含媒体、游戏、AI、网络测试等分类；广告组使用 PASS，需要支持该策略的客户端。",
+      "config_url": "https://raw.githubusercontent.com/DustinWin/ruleset_geodata/main/rule_templates/DustinWin_Full.ini",
+      "source": {
+        "name": "DustinWin/ruleset_geodata",
+        "url": "https://github.com/DustinWin/ruleset_geodata/blob/main/rule_templates/DustinWin_Full.ini",
+        "retrieved_at": "2026-09-11",
+        "license": "GPL-3.0"
+      },
+      "warnings": [
+        "上游在线 INI，由转换后端拉取其引用的远程规则集；不是可直接导入 NyaSub 可视化编辑器的 JSON。",
+        "上游地区组未设无节点拦截兜底，SubConverter 在匹配为空时可能加入 DIRECT；使用前检查地区节点。",
+        "广告组包含 PASS；推荐支持 PASS 的 Mihomo / Clash Meta，旧版 Clash 可能不兼容。"
+      ]
+    },
+    {
+      "id": "dustinwin-full-noads",
+      "name": "DustinWin · 全分组 · 无广告拦截",
+      "description": "保留媒体、游戏、AI 等完整分类，不附带广告拦截。",
+      "config_url": "https://raw.githubusercontent.com/DustinWin/ruleset_geodata/main/rule_templates/DustinWin_Full_NoAds.ini",
+      "source": {
+        "name": "DustinWin/ruleset_geodata",
+        "url": "https://github.com/DustinWin/ruleset_geodata/blob/main/rule_templates/DustinWin_Full_NoAds.ini",
+        "retrieved_at": "2026-09-11",
+        "license": "GPL-3.0"
+      },
+      "warnings": [
+        "上游在线 INI，由转换后端拉取其引用的远程规则集；不是可直接导入 NyaSub 可视化编辑器的 JSON。",
+        "上游地区组未设无节点拦截兜底，SubConverter 在匹配为空时可能加入 DIRECT；使用前检查地区节点。"
+      ]
+    },
+    {
+      "id": "dustinwin-lite",
+      "name": "DustinWin · 精简分组 + 广告拦截",
+      "description": "保留 AI、常见服务和网络测试；广告组使用 PASS，需要支持该策略的客户端。",
+      "config_url": "https://raw.githubusercontent.com/DustinWin/ruleset_geodata/main/rule_templates/DustinWin_Lite.ini",
+      "source": {
+        "name": "DustinWin/ruleset_geodata",
+        "url": "https://github.com/DustinWin/ruleset_geodata/blob/main/rule_templates/DustinWin_Lite.ini",
+        "retrieved_at": "2026-09-11",
+        "license": "GPL-3.0"
+      },
+      "warnings": [
+        "上游在线 INI，由转换后端拉取其引用的远程规则集；不是可直接导入 NyaSub 可视化编辑器的 JSON。",
+        "上游地区组未设无节点拦截兜底，SubConverter 在匹配为空时可能加入 DIRECT；使用前检查地区节点。",
+        "广告组包含 PASS；推荐支持 PASS 的 Mihomo / Clash Meta，旧版 Clash 可能不兼容。"
+      ]
+    },
+    {
+      "id": "dustinwin-lite-noads",
+      "name": "DustinWin · 精简分组 · 无广告拦截",
+      "description": "保留 AI、常见服务和网络测试，不附带广告拦截。",
+      "config_url": "https://raw.githubusercontent.com/DustinWin/ruleset_geodata/main/rule_templates/DustinWin_Lite_NoAds.ini",
+      "source": {
+        "name": "DustinWin/ruleset_geodata",
+        "url": "https://github.com/DustinWin/ruleset_geodata/blob/main/rule_templates/DustinWin_Lite_NoAds.ini",
+        "retrieved_at": "2026-09-11",
+        "license": "GPL-3.0"
+      },
+      "warnings": [
+        "上游在线 INI，由转换后端拉取其引用的远程规则集；不是可直接导入 NyaSub 可视化编辑器的 JSON。",
+        "上游地区组未设无节点拦截兜底，SubConverter 在匹配为空时可能加入 DIRECT；使用前检查地区节点。"
+      ]
+    },
+    {
+      "id": "dustinwin-light",
+      "name": "DustinWin · 轻量分流",
+      "description": "使用 GFW、国内域名和国内 IP 分类，保留地区选择。",
+      "config_url": "https://raw.githubusercontent.com/DustinWin/ruleset_geodata/main/rule_templates/DustinWin_Light.ini",
+      "source": {
+        "name": "DustinWin/ruleset_geodata",
+        "url": "https://github.com/DustinWin/ruleset_geodata/blob/main/rule_templates/DustinWin_Light.ini",
+        "retrieved_at": "2026-09-11",
+        "license": "GPL-3.0"
+      },
+      "warnings": [
+        "上游在线 INI，由转换后端拉取其引用的远程规则集；不是可直接导入 NyaSub 可视化编辑器的 JSON。",
+        "上游地区组未设无节点拦截兜底，SubConverter 在匹配为空时可能加入 DIRECT；使用前检查地区节点。"
+      ]
+    },
+    {
+      "id": "dustinwin-nano",
+      "name": "DustinWin · 极简分流",
+      "description": "按国内 IP 与最终策略分流，保留自动、手动与地区选择。",
+      "config_url": "https://raw.githubusercontent.com/DustinWin/ruleset_geodata/main/rule_templates/DustinWin_Nano.ini",
+      "source": {
+        "name": "DustinWin/ruleset_geodata",
+        "url": "https://github.com/DustinWin/ruleset_geodata/blob/main/rule_templates/DustinWin_Nano.ini",
+        "retrieved_at": "2026-09-11",
+        "license": "GPL-3.0"
+      },
+      "warnings": [
+        "上游在线 INI，由转换后端拉取其引用的远程规则集；不是可直接导入 NyaSub 可视化编辑器的 JSON。",
+        "上游地区组未设无节点拦截兜底，SubConverter 在匹配为空时可能加入 DIRECT；使用前检查地区节点。"
+      ]
+    }
+  ]
+}

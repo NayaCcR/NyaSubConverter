@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { OptionFields } from "@/components/conversion/option-fields";
 import { useAppData } from "@/components/providers/app-data-provider";
+import { useRuleCatalog } from "@/components/providers/rule-catalog-provider";
 import { PageHeader, PrivacyBadge, SectionTitle, buttonPrimary, buttonSecondary, iconButton, inputClass } from "@/components/ui/app-ui";
 import {
   buildConvertUrl,
@@ -42,6 +43,7 @@ import { cn } from "@/lib/utils";
 
 export default function HomePage() {
   const { ready, providers, profiles, settings, setHistory, setProviders } = useAppData();
+  const { selectedConfig, clearSelection } = useRuleCatalog();
   const enabledProviders = providers.filter((item) => item.enabled);
   const defaultProvider = enabledProviders.find((item) => item.isDefault) ?? enabledProviders[0];
   const [source, setSource] = useState("");
@@ -68,6 +70,13 @@ export default function HomePage() {
   const popularTargets = targets.filter((item) => item.popular);
   const otherTargets = targets.filter((item) => !item.popular);
   const isOtherTarget = otherTargets.some((item) => item.value === options.target);
+
+  useEffect(() => {
+    if (!selectedConfig) return;
+    setOptions((current) => ({ ...current, config: selectedConfig }));
+    setAdvanced(true);
+    clearSelection();
+  }, [selectedConfig, clearSelection]);
 
   useEffect(() => {
     if (!ready || shortSelectionReady.current) return;

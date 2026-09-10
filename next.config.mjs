@@ -7,6 +7,13 @@ const nextConfig = {
     // Media is served through the API; Next's optimizer is not used.
     unoptimized: true,
   },
+  // Only bundled public rule assets are cross-origin readable. No credentials.
+  async headers() {
+    return [{ source: "/rules/:path*", headers: [
+      { key: "Access-Control-Allow-Origin", value: "*" },
+      { key: "Cache-Control", value: "no-cache" },
+    ] }];
+  },
   // Point the frontend at a backend without CORS by proxying /api and /health.
   async rewrites() {
     if (!backend) return [];

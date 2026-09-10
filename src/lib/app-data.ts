@@ -63,6 +63,7 @@ export type HistoryItem = {
 
 export type AppSettings = {
   publicListUrl: string;
+  ruleCatalogUrl: string;
   shortUrlEndpoint: string;
   shortUrlToken: string;
   shortUrlServices: CustomShortUrlService[];
@@ -176,6 +177,7 @@ export const defaultProfiles: Profile[] = [
 
 export const defaultSettings: AppSettings = {
   publicListUrl: "",
+  ruleCatalogUrl: "/rules/catalog.json",
   shortUrlEndpoint: "",
   shortUrlToken: "",
   shortUrlServices: [],
@@ -235,6 +237,7 @@ export function normalizeSettings(value?: Partial<AppSettings> | null): AppSetti
 
   return {
     ...merged,
+    ruleCatalogUrl: typeof merged.ruleCatalogUrl === "string" && merged.ruleCatalogUrl.trim() ? merged.ruleCatalogUrl.trim() : defaultSettings.ruleCatalogUrl,
     shortUrlEndpoint: typeof merged.shortUrlEndpoint === "string" ? merged.shortUrlEndpoint : "",
     shortUrlToken: typeof merged.shortUrlToken === "string" ? merged.shortUrlToken : "",
     shortUrlServices,
