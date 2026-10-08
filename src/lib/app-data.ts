@@ -86,6 +86,10 @@ export type ShortUrlServiceOption = {
   label: string;
   endpoint: string;
   token: string;
+  /** 该服务的说明文案，会显示在转换页短链 API 下拉框下方。 */
+  tip?: string;
+  /** 该服务的注册 / 首页地址，配合 tip 一起显示为下划线链接。 */
+  registerUrl?: string;
 };
 
 export const defaultOptions: ConvertOptions = {
@@ -175,10 +179,16 @@ export const defaultProfiles: Profile[] = [
   },
 ];
 
+/** link.31n.cc 的公开短链接口。路径约定见 shlink-client-deck 的 /api/default。 */
+export const linkConsoleShortUrlEndpoint = "https://link.31n.cc/api/default/short-urls";
+
+/** link.31n.cc 的注册 / 首页地址。 */
+export const linkConsoleRegisterUrl = "https://link.31n.cc/";
+
 export const defaultSettings: AppSettings = {
   publicListUrl: "",
   ruleCatalogUrl: "/rules/catalog.json",
-  shortUrlEndpoint: "",
+  shortUrlEndpoint: linkConsoleShortUrlEndpoint,
   shortUrlToken: "",
   shortUrlServices: [],
   configUploadEndpoint: "",
@@ -212,6 +222,14 @@ export const targets = [
 ];
 
 export const shortUrlServices = [
+  {
+    id: "builtin-link-console",
+    label: "link.31n.cc",
+    endpoint: linkConsoleShortUrlEndpoint,
+    token: "",
+    tip: "可以记录点击数据和使用记录的短链服务，快试试。",
+    registerUrl: linkConsoleRegisterUrl,
+  },
   { id: "builtin-v1-mk", label: "v1.mk", endpoint: "https://v1.mk/short", token: "" },
   { id: "builtin-d1-mk", label: "d1.mk", endpoint: "https://d1.mk/short", token: "" },
   { id: "builtin-dlj-tf", label: "dlj.tf", endpoint: "https://dlj.tf/short", token: "" },
@@ -252,16 +270,29 @@ export function getShortUrlServiceName(endpoint: string) {
   }
 }
 
+function shortUrlEndpointKey(value: string) {
+  return value.trim().replace(/\/+$/, "").toLowerCase();
+}
+
 export function getShortUrlServiceOptions(settings: AppSettings): ShortUrlServiceOption[] {
   const configured: ShortUrlServiceOption[] = [];
-  if (settings.shortUrlEndpoint.trim()) {
+  const endpoint = settings.shortUrlEndpoint.trim();
+
+  if (endpoint) {
+    // 默认地址正好是某个内置服务时，沿用它的名字和提示，避免下拉框里出现两条同样的地址。
+    const builtin = shortUrlServices.find(
+      (item) => shortUrlEndpointKey(item.endpoint) === shortUrlEndpointKey(endpoint),
+    );
     configured.push({
       id: "configured-default",
-      label: "默认短链 API",
-      endpoint: settings.shortUrlEndpoint.trim(),
+      label: builtin ? builtin.label : "默认短链 API",
+      endpoint,
       token: settings.shortUrlToken,
+      tip: builtin?.tip,
+      registerUrl: builtin?.registerUrl,
     });
   }
+
   settings.shortUrlServices.forEach((service) => {
     if (!service.endpoint.trim()) return;
     configured.push({
@@ -271,7 +302,9 @@ export function getShortUrlServiceOptions(settings: AppSettings): ShortUrlServic
       token: service.token,
     });
   });
-  return [...configured, ...shortUrlServices];
+
+  const used = new Set(configured.map((item) => shortUrlEndpointKey(item.endpoint)));
+  return [...configured, ...shortUrlServices.filter((item) => !used.has(shortUrlEndpointKey(item.endpoint)))];
 }
 
 export const remoteConfigGroups = [
