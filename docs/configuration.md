@@ -42,14 +42,14 @@ src/lib/app-data.ts
 
 ## 默认转换后端
 
-默认 Provider 位于 `defaultProviders`，当前本机后端是：
+默认 Provider 位于 `defaultProviders`，当前内置的自建后端是：
 
 ```ts
 {
   id: "local-subconverter",
   name: "本机 SubConverter",
   type: "self_hosted",
-  endpoint: "http://127.0.0.1:25500/sub",
+  endpoint: "https://sub.31n.cc/sub",
   enabled: true,
   status: "unknown",
   privacy_level: "low",
@@ -57,7 +57,8 @@ src/lib/app-data.ts
 }
 ```
 
-生产环境通常需要把 `endpoint` 改成实际可访问的 HTTPS 地址，并保留完整的 `/sub` 路径，例如：
+这个默认值指向本部署自己的同域后端（前端与 SubConverter 由同一个域名分流：`/` 走前端，`/sub` 与 `/version` 走 SubConverter）。
+如果把前端部署到别处，需要把 `endpoint` 改成实际可访问的 HTTPS 地址，并保留完整的 `/sub` 路径，例如：
 
 ```ts
 endpoint: "https://sub.example.com/sub",

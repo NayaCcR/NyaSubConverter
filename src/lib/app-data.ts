@@ -122,7 +122,7 @@ export const defaultProviders: Provider[] = [
     id: "local-subconverter",
     name: "本机 SubConverter",
     type: "self_hosted",
-    endpoint: "http://127.0.0.1:25500/sub",
+    endpoint: "https://sub.31n.cc/sub",
     enabled: true,
     status: "unknown",
     privacy_level: "low",
