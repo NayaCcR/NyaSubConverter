@@ -4,11 +4,11 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-import { Suspense, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Check, Database, Download, Eye, EyeOff, ExternalLink, KeyRound, Link2, Plus, RotateCcw, Settings, Shield, Trash2, Upload, X } from "lucide-react";
 import { useAppData } from "@/components/providers/app-data-provider";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { catalogUrl } from "@/lib/rule-catalog";
 import { PageHeader, SectionTitle, buttonSecondary, iconButton, inputClass } from "@/components/ui/app-ui";
 import {
@@ -23,6 +23,7 @@ import {
   uid,
 } from "@/lib/app-data";
 import {
+  DEFAULT_SETTINGS_SECTION,
   getSettingsSectionElementId,
   getSettingsSectionHref,
   normalizeSettingsSection,
@@ -62,26 +63,28 @@ function SettingsSectionNav({
   );
 }
 
-// useSearchParams 需要 Suspense 边界，所以拆成外壳 + 内容两部分。
 export default function SettingsPage() {
-  return (
-    <Suspense fallback={null}>
-      <SettingsContent />
-    </Suspense>
-  );
-}
-
-function SettingsContent() {
   const { providers, profiles, history, settings, setProviders, setProfiles, setHistory, setSettings } = useAppData();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const section = normalizeSettingsSection(searchParams.get("section"));
+  // ?section= 只在客户端读取，避免 SSR 阶段拿不到参数而把整页渲染成空。
+  const [section, setSection] = useState<SettingsSection>(DEFAULT_SETTINGS_SECTION);
   const sectionMounted = useRef(false);
   const [saved, setSaved] = useState(false);
   const [defaultTokenOpen, setDefaultTokenOpen] = useState(Boolean(settings.shortUrlToken));
   const [newService, setNewService] = useState<ShortServiceDraft | null>(null);
 
-  // 直接带 ?section= 打开、或前进后退时，滚到对应区块。
+  // 首次挂载读一次地址栏，之后监听前进后退。
+  useEffect(() => {
+    const readSection = () =>
+      normalizeSettingsSection(new URLSearchParams(window.location.search).get("section"));
+    const onPopState = () => setSection(readSection());
+
+    setSection(readSection());
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+
+  // 直接带 ?section= 打开、切换段或前进后退时，滚到对应区块。
   useEffect(() => {
     if (!sectionMounted.current) {
       sectionMounted.current = true;
@@ -93,6 +96,7 @@ function SettingsContent() {
   }, [section]);
 
   function selectSection(next: SettingsSection) {
+    setSection(next);
     router.replace(getSettingsSectionHref(next), { scroll: false });
   }
   const inputRef = useRef<HTMLInputElement>(null);
