@@ -14,6 +14,12 @@ pnpm start
 
 `pnpm start` 默认监听 3000 端口。可通过反向代理公开 HTTPS 服务。
 
+需要固定监听地址和端口时（例如交给宝塔等 Node 项目管理器托管），使用 `run` 脚本。它绑定 `127.0.0.1:3033`，只接受本机反向代理访问，不直接暴露到公网：
+
+```powershell
+pnpm run run
+```
+
 ## Nginx 示例
 
 ```nginx
