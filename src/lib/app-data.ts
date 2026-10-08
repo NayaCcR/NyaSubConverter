@@ -179,8 +179,8 @@ export const defaultProfiles: Profile[] = [
   },
 ];
 
-/** link.31n.cc 的公开短链接口。路径约定见 shlink-client-deck 的 /api/default。 */
-export const linkConsoleShortUrlEndpoint = "https://link.31n.cc/api/default/short-urls";
+/** link.31n.cc 的公开短链接口。后端由 Token 绑定决定，地址里不带 serverId。 */
+export const linkConsoleShortUrlEndpoint = "https://link.31n.cc/api/short-urls";
 
 /** link.31n.cc 的注册 / 首页地址。 */
 export const linkConsoleRegisterUrl = "https://link.31n.cc/";

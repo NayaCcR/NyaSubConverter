@@ -91,11 +91,11 @@ export const defaultSettings: AppSettings = {
 这里的 `shortUrlEndpoint` 默认指向公开的 link.31n.cc：
 
 ```ts
-shortUrlEndpoint: "https://link.31n.cc/api/default/short-urls",
+shortUrlEndpoint: "https://link.31n.cc/api/short-urls",
 shortUrlToken: "",
 ```
 
-`shortUrlToken` 默认留空，也就是开箱可用但不会带上任何人的凭证；使用者在“设置 → 扩展服务”里填入自己的 Token 后，才会切换成 Shlink 的 JSON 协议。要换成自己的服务时改这个地址即可，例如自建 Hosted 实例的 `https://link.example.com/api/default/short-urls`（`/api/default` 由 Token 绑定决定后端，不再需要写 serverId）。
+`shortUrlToken` 默认留空，也就是开箱可用但不会带上任何人的凭证；使用者在“设置 → 扩展服务”里填入自己的 Token 后，才会切换成 Shlink 的 JSON 协议。要换成自己的服务时改这个地址即可，例如自建 Hosted 实例的 `https://link.example.com/api/short-urls`。地址里不需要写后端 —— Link Console 会用该 Token 绑定的后端。
 
 `shortUrlToken` 配置后，前端会使用：
 
@@ -115,7 +115,7 @@ shortUrlServices: [
   {
     id: "link-console",
     name: "Link Console",
-    endpoint: "https://link.example.com/api/default/short-urls",
+    endpoint: "https://link.example.com/api/short-urls",
     token: "",
   },
 ],
