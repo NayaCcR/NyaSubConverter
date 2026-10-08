@@ -88,12 +88,14 @@ export const defaultSettings: AppSettings = {
 };
 ```
 
-这里的 `shortUrlEndpoint` 默认留空，表示应用不会自动调用短链服务。需要编译时预置一个服务时，可以修改为：
+这里的 `shortUrlEndpoint` 默认指向公开的 link.31n.cc：
 
 ```ts
-shortUrlEndpoint: "https://link.example.com/api/hosted/shlink/server-id/short-urls",
+shortUrlEndpoint: "https://link.31n.cc/api/default/short-urls",
 shortUrlToken: "",
 ```
+
+`shortUrlToken` 默认留空，也就是开箱可用但不会带上任何人的凭证；使用者在“设置 → 扩展服务”里填入自己的 Token 后，才会切换成 Shlink 的 JSON 协议。要换成自己的服务时改这个地址即可，例如自建 Hosted 实例的 `https://link.example.com/api/default/short-urls`（`/api/default` 由 Token 绑定决定后端，不再需要写 serverId）。
 
 `shortUrlToken` 配置后，前端会使用：
 
@@ -113,7 +115,7 @@ shortUrlServices: [
   {
     id: "link-console",
     name: "Link Console",
-    endpoint: "https://link.example.com/api/hosted/shlink/server-id/short-urls",
+    endpoint: "https://link.example.com/api/default/short-urls",
     token: "",
   },
 ],
@@ -121,7 +123,9 @@ shortUrlServices: [
 
 运行后也可以在“设置 → 扩展服务”中添加服务。运行时新增的服务会按添加顺序排在内置短链服务的前面。
 
-内置的无 Token 短链服务列表位于 `shortUrlServices` 常量，当前包括 `v1.mk`、`d1.mk`、`dlj.tf`、`suo.yt` 和 `sub.cm`。它们与 `defaultSettings.shortUrlEndpoint` 是两套配置：前者是下拉框中的内置选项，后者是编译时预置的默认服务。
+内置的无 Token 短链服务列表位于 `shortUrlServices` 常量，当前包括 `link.31n.cc`、`v1.mk`、`d1.mk`、`dlj.tf`、`suo.yt` 和 `sub.cm`。它们与 `defaultSettings.shortUrlEndpoint` 是两套配置：前者是下拉框中的内置选项，后者是编译时预置的默认服务。
+
+两者地址相同时不会出现重复条目：下拉框会沿用内置服务的名称，并继承它的 `tip` 和 `registerUrl`。这两个可选字段用来在下拉框下方显示一句说明和一条下划线注册链接——内置的 link.31n.cc 会显示「可以记录点击数据和使用记录的短链服务，快试试。」并附上注册入口。
 
 ## Token 安全提示
 

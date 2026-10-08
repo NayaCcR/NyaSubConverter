@@ -52,6 +52,6 @@ https://sub.example.com/sub
 - 短链 API：未配置 Token 时接收兼容 sub-web-api 的 `longUrl` 和可选 `shortKey` 表单字段，返回 `ShortUrl`；配置 Token 后使用 `Authorization: Bearer <token>`，以 JSON 发送 `longUrl` 和可选 `customSlug`，兼容 Shlink / shlink-client-deck API。
 - 配置托管 API：接收 `config` 表单字段，返回 `{ "code": 0, "data": "https://..." }`。
 
-设置中可以为默认短链 API 添加可选 Token，也可以继续添加多个短链服务。新增服务按添加顺序显示在订阅转换页的短链 API 下拉框顶部；Token 默认以密码形式隐藏，仅保存在当前浏览器本地数据中。
+默认短链 API 预置为 link.31n.cc（`https://link.31n.cc/api/default/short-urls`）——一个可以记录点击数据和使用记录的短链服务，Token 默认为空、由使用者在“设置 → 扩展服务”中自行填写。设置里也可以为它添加可选 Token，或者继续添加多个短链服务；新增服务按添加顺序显示在订阅转换页的短链 API 下拉框顶部，内置服务紧随其后。Token 默认以密码形式隐藏，仅保存在当前浏览器本地数据中。
 
 这些服务会接触订阅地址或配置正文，默认不配置、不调用。
