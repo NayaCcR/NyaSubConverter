@@ -182,8 +182,8 @@ export const defaultProfiles: Profile[] = [
 /** link.31n.cc 的公开短链接口。后端由 Token 绑定决定，地址里不带 serverId。 */
 export const linkConsoleShortUrlEndpoint = "https://link.31n.cc/api/short-urls";
 
-/** link.31n.cc 的注册 / 首页地址。 */
-export const linkConsoleRegisterUrl = "https://link.31n.cc/";
+/** link.31n.cc 的注册页地址。 */
+export const linkConsoleRegisterUrl = "https://link.31n.cc/?register";
 
 export const defaultSettings: AppSettings = {
   publicListUrl: "",
