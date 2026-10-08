@@ -4,15 +4,15 @@
 
 ## 构建与运行
 
-在 `Front` 目录执行：
+在仓库根目录执行：
 
 ```powershell
-npm ci
-npm run build
-npm start
+pnpm install --frozen-lockfile
+pnpm build
+pnpm start
 ```
 
-`npm start` 默认监听 3000 端口。可通过反向代理公开 HTTPS 服务。
+`pnpm start` 默认监听 3000 端口。可通过反向代理公开 HTTPS 服务。
 
 ## Nginx 示例
 

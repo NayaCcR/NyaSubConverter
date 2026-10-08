@@ -7,8 +7,8 @@
 ## 开发
 
 ```powershell
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 打开 `http://localhost:3000`。所有 Provider、Profile、历史与设置默认保存在浏览器 `localStorage` 中。
@@ -24,7 +24,7 @@ https://sub.example.com/sub
 
 公共服务列表支持 JSON 数组或 `{ "providers": [...] }` 格式。每项至少包含 `name` 与 `endpoint`，可选字段为 `id`、`enabled` 和 `privacy_level`。
 
-在 `npm run dev` 开发模式下，转换后端页会显示“导出公共列表”。它将当前已启用的后端下载为：
+在 `pnpm dev` 开发模式下，转换后端页会显示“导出公共列表”。它将当前已启用的后端下载为：
 
 ```json
 {

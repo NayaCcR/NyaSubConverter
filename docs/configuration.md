@@ -3,10 +3,23 @@
 ## NyaStack 共享依赖
 
 本产品从 GitHub Packages 消费 `@nayaccr/theme`、`@nayaccr/ui` 和 `@nayaccr/utils`。
-本地首次安装前运行以下命令，用户名填写小写 `nayaccr`，密码填写具有 `read:packages` 权限的 classic PAT（不是 GitHub 登录密码）：
+本地首次安装前需要先完成 GitHub Packages 认证，任选一种方式：
 
 ```powershell
+# 方式一：交互式登录。GitHub Packages 只支持 legacy 认证，而 `pnpm login` 没有 `--auth-type` 选项，
+# 因此这里刻意保留 npm login —— 它只负责把凭据写进 ~/.npmrc，pnpm 读取的是同一份文件，安装本身仍用 pnpm。
+# 用户名填写小写 `nayaccr`，密码填写具有 `read:packages` 权限的 classic PAT（不是 GitHub 登录密码）。
 npm login --scope=@nayaccr --registry=https://npm.pkg.github.com --auth-type=legacy
+```
+
+```powershell
+# 方式二：直接写入全局 token，适合服务器与 CI 等无交互环境。token 只落在 ~/.npmrc，不要写进仓库。
+pnpm config set -g //npm.pkg.github.com/:_authToken=<classic PAT>
+```
+
+认证完成后安装依赖：
+
+```powershell
 pnpm install --frozen-lockfile
 ```
 

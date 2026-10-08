@@ -7,7 +7,7 @@
 在开发模式运行：
 
 ```powershell
-npm run dev
+pnpm dev
 ```
 
 打开“转换后端”，点击“导出公共列表”。应用会下载 `nya-subconverter-providers.json`，仅包含当前已启用的后端。

@@ -2,17 +2,17 @@
 
 ## 前提条件
 
-- Node.js 18.17 或更高版本。
-- npm。
+- Node.js 22.13 或更高版本（推荐 `.node-version` 指定的 Node.js 24）。
+- pnpm 11，版本由 `package.json` 的 `packageManager` 固定。
 - 可选：一个可访问的 SubConverter 兼容服务。
 
 ## 本地运行
 
-在 `Front` 目录执行：
+在仓库根目录执行：
 
 ```powershell
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 打开 `http://localhost:3000`。
